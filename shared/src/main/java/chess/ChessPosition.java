@@ -9,8 +9,8 @@ import com.sun.source.tree.ReturnTree;
  * signature of the existing methods.
  */
 public class ChessPosition {
-    private int row = 0;
-    private int col = 0;
+    private int row;
+    private int col;
 
     public ChessPosition(int row, int col) {
         this.row = row;
