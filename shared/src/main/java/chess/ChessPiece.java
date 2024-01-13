@@ -60,10 +60,29 @@ public class ChessPiece {
             case BISHOP -> {
                 return bishopMoves(board, myPosition);
             }
+            case KING -> {
+                return kingMoves(board, myPosition);
+            }
             default -> {
                 return new ArrayList<>();
             }
         }
+    }
+
+    private Collection<ChessMove> checkMove(Collection<ChessMove> moves, ChessBoard board, ChessPosition myPosition, ChessPosition checkedPos){
+        if(checkedPos.getRow() > 8 || checkedPos.getRow() < 1 ||checkedPos.getColumn() > 8 || checkedPos.getColumn() < 1){
+            //Out of bounds
+            return moves;
+        }
+        if (board.getPiece(checkedPos) == null){
+            //Free Space
+            moves.add(new ChessMove(myPosition,checkedPos,null));
+        }
+        else if (board.getPiece(checkedPos).getTeamColor() != pieceColor){
+            //Enemy space
+            moves.add(new ChessMove(myPosition,checkedPos,null));
+        }
+        return moves;
     }
 
     private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
@@ -74,14 +93,8 @@ public class ChessPiece {
         int i = 1;
         while (row + i <= 8 && col + i <= 8){
             var checkedPos = new ChessPosition(row + i, col + i);
-            if (board.getPiece(checkedPos) == null){
-                moves.add(new ChessMove(myPosition,checkedPos,null));
-            }
-            else if (board.getPiece(checkedPos).getTeamColor() == pieceColor){
-                break;
-            }
-            else {
-                moves.add(new ChessMove(myPosition,checkedPos,null));
+            moves = checkMove(moves,board,myPosition,checkedPos);
+            if (board.getPiece(checkedPos) != null){
                 break;
             }
             i++;
@@ -90,14 +103,8 @@ public class ChessPiece {
         i = 1;
         while (row - i >= 1 && col + i <= 8){
             var checkedPos = new ChessPosition(row - i, col + i);
-            if (board.getPiece(checkedPos) == null){
-                moves.add(new ChessMove(myPosition,checkedPos,null));
-            }
-            else if (board.getPiece(checkedPos).getTeamColor() == pieceColor){
-                break;
-            }
-            else {
-                moves.add(new ChessMove(myPosition,checkedPos,null));
+            moves = checkMove(moves,board,myPosition,checkedPos);
+            if (board.getPiece(checkedPos) != null){
                 break;
             }
             i++;
@@ -106,14 +113,8 @@ public class ChessPiece {
         i = 1;
         while (row - i >= 1 && col - i >= 1){
             var checkedPos = new ChessPosition(row - i, col - i);
-            if (board.getPiece(checkedPos) == null){
-                moves.add(new ChessMove(myPosition,checkedPos,null));
-            }
-            else if (board.getPiece(checkedPos).getTeamColor() == pieceColor){
-                break;
-            }
-            else {
-                moves.add(new ChessMove(myPosition,checkedPos,null));
+            moves = checkMove(moves,board,myPosition,checkedPos);
+            if (board.getPiece(checkedPos) != null){
                 break;
             }
             i++;
@@ -122,14 +123,8 @@ public class ChessPiece {
         i = 1;
         while (row + i <= 8 && col - i >= 1){
             var checkedPos = new ChessPosition(row + i, col - i);
-            if (board.getPiece(checkedPos) == null){
-                moves.add(new ChessMove(myPosition,checkedPos,null));
-            }
-            else if (board.getPiece(checkedPos).getTeamColor() == pieceColor){
-                break;
-            }
-            else {
-                moves.add(new ChessMove(myPosition,checkedPos,null));
+            moves = checkMove(moves,board,myPosition,checkedPos);
+            if (board.getPiece(checkedPos) != null){
                 break;
             }
             i++;
@@ -137,6 +132,20 @@ public class ChessPiece {
         return moves;
     }
 
+    private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition){
+        Collection<ChessMove> moves = new ArrayList<ChessMove>();
+        var row = myPosition.getRow();
+        var col = myPosition.getColumn();
+        moves = checkMove(moves,board,myPosition,new ChessPosition(row+1,col+1));
+        moves = checkMove(moves,board,myPosition,new ChessPosition(row+1,col));
+        moves = checkMove(moves,board,myPosition,new ChessPosition(row+1,col-1));
+        moves = checkMove(moves,board,myPosition,new ChessPosition(row,col-1));
+        moves = checkMove(moves,board,myPosition,new ChessPosition(row-1,col-1));
+        moves = checkMove(moves,board,myPosition,new ChessPosition(row-1,col));
+        moves = checkMove(moves,board,myPosition,new ChessPosition(row-1,col+1));
+        moves = checkMove(moves,board,myPosition,new ChessPosition(row,col+1));
+        return moves;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
