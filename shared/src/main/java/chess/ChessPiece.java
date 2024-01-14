@@ -63,6 +63,9 @@ public class ChessPiece {
             case KING -> {
                 return kingMoves(board, myPosition);
             }
+            case KNIGHT -> {
+                return knightMoves(board, myPosition);
+            }
             default -> {
                 return new ArrayList<>();
             }
@@ -146,6 +149,22 @@ public class ChessPiece {
         moves = checkMove(moves,board,myPosition,new ChessPosition(row,col+1));
         return moves;
     }
+
+    private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition){
+        Collection<ChessMove> moves = new ArrayList<ChessMove>();
+        var row = myPosition.getRow();
+        var col = myPosition.getColumn();
+        moves = checkMove(moves,board,myPosition,new ChessPosition(row+2,col+1));
+        moves = checkMove(moves,board,myPosition,new ChessPosition(row+1,col+2));
+        moves = checkMove(moves,board,myPosition,new ChessPosition(row+2,col-1));
+        moves = checkMove(moves,board,myPosition,new ChessPosition(row+1,col-2));
+        moves = checkMove(moves,board,myPosition,new ChessPosition(row-2,col-1));
+        moves = checkMove(moves,board,myPosition,new ChessPosition(row-1,col-2));
+        moves = checkMove(moves,board,myPosition,new ChessPosition(row-2,col+1));
+        moves = checkMove(moves,board,myPosition,new ChessPosition(row-1,col+2));
+        return moves;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
