@@ -55,7 +55,6 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> moves = new ArrayList<ChessMove>();
         switch (type){
             case BISHOP -> {
                 return bishopMoves(board, myPosition);
@@ -65,6 +64,12 @@ public class ChessPiece {
             }
             case KNIGHT -> {
                 return knightMoves(board, myPosition);
+            }
+            case QUEEN -> {
+                return queenMoves(board, myPosition);
+            }
+            case ROOK -> {
+                return rookMoves(board, myPosition);
             }
             default -> {
                 return new ArrayList<>();
@@ -162,6 +167,100 @@ public class ChessPiece {
         moves = checkMove(moves,board,myPosition,new ChessPosition(row-1,col-2));
         moves = checkMove(moves,board,myPosition,new ChessPosition(row-2,col+1));
         moves = checkMove(moves,board,myPosition,new ChessPosition(row-1,col+2));
+        return moves;
+    }
+
+    private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> moves = new ArrayList<ChessMove>();
+        var row = myPosition.getRow();
+        var col = myPosition.getColumn();
+        //up right check
+        int i = 1;
+        while (row + i <= 8 && col + i <= 8){
+            var checkedPos = new ChessPosition(row + i, col + i);
+            moves = checkMove(moves,board,myPosition,checkedPos);
+            if (board.getPiece(checkedPos) != null){
+                break;
+            }
+            i++;
+        }
+        //down right check
+        i = 1;
+        while (row - i >= 1 && col + i <= 8){
+            var checkedPos = new ChessPosition(row - i, col + i);
+            moves = checkMove(moves,board,myPosition,checkedPos);
+            if (board.getPiece(checkedPos) != null){
+                break;
+            }
+            i++;
+        }
+        //down left check
+        i = 1;
+        while (row - i >= 1 && col - i >= 1){
+            var checkedPos = new ChessPosition(row - i, col - i);
+            moves = checkMove(moves,board,myPosition,checkedPos);
+            if (board.getPiece(checkedPos) != null){
+                break;
+            }
+            i++;
+        }
+        //up left check
+        i = 1;
+        while (row + i <= 8 && col - i >= 1){
+            var checkedPos = new ChessPosition(row + i, col - i);
+            moves = checkMove(moves,board,myPosition,checkedPos);
+            if (board.getPiece(checkedPos) != null){
+                break;
+            }
+            i++;
+        }
+        return moves;
+    }
+
+    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> moves = new ArrayList<ChessMove>();
+        var row = myPosition.getRow();
+        var col = myPosition.getColumn();
+        //up check
+        int i = 1;
+        while (row + i <= 8){
+            var checkedPos = new ChessPosition(row + i, col);
+            moves = checkMove(moves,board,myPosition,checkedPos);
+            if (board.getPiece(checkedPos) != null){
+                break;
+            }
+            i++;
+        }
+        //right check
+        i = 1;
+        while (col + i <= 8){
+            var checkedPos = new ChessPosition(row, col + i);
+            moves = checkMove(moves,board,myPosition,checkedPos);
+            if (board.getPiece(checkedPos) != null){
+                break;
+            }
+            i++;
+        }
+        //down check
+        i = 1;
+        while (row - i >= 1){
+            var checkedPos = new ChessPosition(row - i, col);
+            moves = checkMove(moves,board,myPosition,checkedPos);
+            if (board.getPiece(checkedPos) != null){
+                break;
+            }
+            i++;
+        }
+        //left check
+        i = 1;
+        while (col - i >= 1){
+            var checkedPos = new ChessPosition(row, col - i);
+            moves = checkMove(moves,board,myPosition,checkedPos);
+            if (board.getPiece(checkedPos) != null){
+                break;
+            }
+            i++;
+        }
         return moves;
     }
 
