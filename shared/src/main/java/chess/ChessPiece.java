@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 
 /**
@@ -102,8 +103,8 @@ public class ChessPiece {
         }
         if (team == ChessGame.TeamColor.WHITE && checkedPos.getRow() == 8){
             // add white promotion options
-            moves.add(new ChessMove(myPosition,checkedPos,PieceType.KNIGHT));
             moves.add(new ChessMove(myPosition,checkedPos,PieceType.BISHOP));
+            moves.add(new ChessMove(myPosition,checkedPos,PieceType.KNIGHT));
             moves.add(new ChessMove(myPosition,checkedPos,PieceType.QUEEN));
             moves.add(new ChessMove(myPosition,checkedPos,PieceType.ROOK));
         }
@@ -124,44 +125,36 @@ public class ChessPiece {
         var row = myPosition.getRow();
         var col = myPosition.getColumn();
         //up right check
-        int i = 1;
-        while (row + i <= 8 && col + i <= 8){
+        for (int i = 1; row + i <= 8 && col + i <= 8; i++){
             var checkedPos = new ChessPosition(row + i, col + i);
             checkMove(moves,board,myPosition,checkedPos);
             if (board.getPiece(checkedPos) != null){
                 break;
             }
-            i++;
         }
         //down right check
-        i = 1;
-        while (row - i >= 1 && col + i <= 8){
+        for (int i = 1; row - i >= 1 && col + i <= 8; i++){
             var checkedPos = new ChessPosition(row - i, col + i);
             checkMove(moves,board,myPosition,checkedPos);
             if (board.getPiece(checkedPos) != null){
                 break;
             }
-            i++;
         }
         //down left check
-        i = 1;
-        while (row - i >= 1 && col - i >= 1){
+        for (int i = 1; row - i >= 1 && col - i >= 1; i++){
             var checkedPos = new ChessPosition(row - i, col - i);
             checkMove(moves,board,myPosition,checkedPos);
             if (board.getPiece(checkedPos) != null){
                 break;
             }
-            i++;
         }
         //up left check
-        i = 1;
-        while (row + i <= 8 && col - i >= 1){
+        for (int i = 1; row + i <= 8 && col - i >= 1; i++){
             var checkedPos = new ChessPosition(row + i, col - i);
             checkMove(moves,board,myPosition,checkedPos);
             if (board.getPiece(checkedPos) != null){
                 break;
             }
-            i++;
         }
         return moves;
     }
@@ -197,7 +190,7 @@ public class ChessPiece {
     }
 
     private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition){
-        Collection<ChessMove> moves = new ArrayList<>();
+        Collection<ChessMove> moves = new HashSet<>();
         var row = myPosition.getRow();
         var col = myPosition.getColumn();
         if(pieceColor == ChessGame.TeamColor.WHITE){
@@ -263,7 +256,7 @@ public class ChessPiece {
     }
 
     private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> moves = new ArrayList<>();
+        Collection<ChessMove> moves = new HashSet<>();
         var row = myPosition.getRow();
         var col = myPosition.getColumn();
         //up check
