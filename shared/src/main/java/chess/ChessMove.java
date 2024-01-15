@@ -44,6 +44,8 @@ public class ChessMove {
         return promotionPiece;
     }
 
+
+    /* ------------- Testing functions ------------*/
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -57,12 +59,12 @@ public class ChessMove {
         return Objects.hash(startPosition, endPosition, promotionPiece);
     }
 
-//    @Override
-//    public String toString() {
-//        return "Move{" +
-//                "start=" + startPosition +
-//                ", end=" + endPosition +
-//                ", promotion=" + promotionPiece +
-//                "} \n";
-//    }
+    @Override
+    public String toString() {
+        return "Move{" +
+                "start=" + startPosition +
+                ", end=" + endPosition +
+                ", promotion=" + promotionPiece +
+                "} \n";
+    }
 }

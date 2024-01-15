@@ -81,6 +81,7 @@ public class ChessPiece {
         }
     }
 
+    // Function to check if a move is valid and add it to a moves list
     private void checkMove(Collection<ChessMove> moves, ChessBoard board, ChessPosition myPosition, ChessPosition checkedPos){
         if(checkedPos.getRow() > 8 || checkedPos.getRow() < 1 ||checkedPos.getColumn() > 8 || checkedPos.getColumn() < 1){
             //Out of bounds
@@ -96,6 +97,7 @@ public class ChessPiece {
         }
     }
 
+    // Function to check if a pawn can be promoted at a valid place on the board and adds the correct moves to a moves list
     private void pawnPromotionCheck(Collection<ChessMove> moves, ChessPosition myPosition, ChessPosition checkedPos, ChessGame.TeamColor team){
         if(checkedPos.getRow() > 8 || checkedPos.getRow() < 1 ||checkedPos.getColumn() > 8 || checkedPos.getColumn() < 1){
             //Out of bounds
@@ -120,6 +122,7 @@ public class ChessPiece {
         }
     }
 
+    //Checks all possible moves for bishop
     private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
         var row = myPosition.getRow();
@@ -159,6 +162,7 @@ public class ChessPiece {
         return moves;
     }
 
+    //Checks all possible moves for king
     private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition){
         Collection<ChessMove> moves = new ArrayList<>();
         var row = myPosition.getRow();
@@ -174,6 +178,7 @@ public class ChessPiece {
         return moves;
     }
 
+    //Checks all possible moves for knight
     private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition){
         Collection<ChessMove> moves = new ArrayList<>();
         var row = myPosition.getRow();
@@ -189,10 +194,12 @@ public class ChessPiece {
         return moves;
     }
 
+    //Checks all possible moves for pawn
     private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition){
         Collection<ChessMove> moves = new HashSet<>();
         var row = myPosition.getRow();
         var col = myPosition.getColumn();
+        //Determine color of pawn
         if(pieceColor == ChessGame.TeamColor.WHITE){
             //white pawn moves up
             var checkedPos = new ChessPosition(row+1,col);
@@ -249,12 +256,14 @@ public class ChessPiece {
         return moves;
     }
 
+    //Checks all possible moves for queen
     private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>(rookMoves(board, myPosition));
         moves.addAll(bishopMoves(board, myPosition));
         return moves;
     }
 
+    //Checks all possible moves for rook
     private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new HashSet<>();
         var row = myPosition.getRow();
@@ -294,6 +303,8 @@ public class ChessPiece {
         return moves;
     }
 
+
+    /* ------------- Testing functions ------------*/
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
