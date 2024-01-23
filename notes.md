@@ -141,3 +141,43 @@ Can have different constructors with different arguments.
 invoke other instructors - this()
 Constructors invoke parents - super()
 Those two will be the first line of code. in a constructor. always. (goes up to Object class)
+
+# Records
+A lot of classes just have data, and basically auto generated methods
+so they made an easy library called Lombok
+then Java was like... why don't we just do it ourseves?
+class, getters, setters, .equals(), .hashcode ext.
+or. 
+public record Ped(int id, String name, String type) {}
+    all feilds are final, no setters
+    constructors take in all fields.
+    kinda just simple data class.
+    to rename, you have to make a new object.
+
+# Programing Exam
+Closes Thurs 5pm
+4 hours
+take a practice run
+details on canvas
+
+# Exceptions
+Try catch
+Exceptions are not necccisarily errors.
+represented as classes and objects
+better than manually error checking like in C
+try{
+    code that could go wrong
+}
+catch (type of exception) {
+    how to handle if it goes wrong.
+}   // could have multiple catches
+
+should either handle or declare
+    handle with a catch, 
+    or pass it up to parent function. and someone else with handle it
+    or it will crash.
+
+Finally 
+    runs always. no matter if there was an exception or not.
+
+#
