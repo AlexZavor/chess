@@ -179,5 +179,104 @@ should either handle or declare
 
 Finally 
     runs always. no matter if there was an exception or not.
+    useually for cleaning up with or without errors
 
-#
+Try with Resources
+    try(open things that could error with "autocloseable" interface) {
+        if it works run here
+    }
+
+Throw yourself
+    throw new AHHHHHHHHException("debug text");
+
+shouldn't catch (definelty not swallow) a runtime exception
+    catch(RuntimeException ex){
+        throw ex
+    }
+
+overwriteen methods exception
+    can't throw new exceptions
+    can throw fewer.
+    can throw subclasses of the same ones
+
+# Collections
+Many classes that all apply to the same interface that we can use.
+
+### List
+Sequence of elements acessed by index. .get(index) .set(index, value)
+    Array list
+    Linked list
+    ListIterator
+        yay iterators, auto for loops, cool stuff
+### Set
+Collection with no duplicates, but no order either
+    add() contains() remove()
+    HashSet
+    TreeSet (sortable)
+    LinkedHashSet (linked list but quiet)
+### Queue
+Good for processing
+    add(value) peek() remove()
+    ArrayDeque (fifo, resizable array)
+    LinkedList (fifo, linked list)
+    PriorityQueue (binary heap)\
+### Deque
+queue that supports work from both ends
+    addFirst, addLast, peekFirst, peekLast, removeFirst, removeLast
+    ArrayDeque
+    Stack? no, its mostly just slow sometimes because it is thread safe.
+        just use an ArrayDeque
+### Map
+key value pairs
+    use key, get data you want.
+    put(key, value), get(key), contains(key), remove(key)
+    keyset(), values(), entrySet()
+    HashMap (hash table implementation)
+    TreeMap
+    LinkedHashMap
+### Iterable
+nice and iterable
+    for(String : words){}
+
+### Other
+make sure you need a .equals() for what goes inside.
+check for your .hashCode() if your collection uses hash
+those two should be based on the same thing
+
+don't change something that is used as a key
+    or else you have to remove, change, reinsert
+
+Some are sorted, things need to be sortable. 
+    make comparable interface or comparitor
+    compareTo(anotherOne one)
+
+# Copy Objects
+Sometimes you want a copy of an object.
+Shallow copy and Deep copy
+Shallow copy
+    reference points to the same object.
+Deep copy
+    reference points to a new object with the same data
+
+How to copy
+    copy Constructors (more C)
+    Clone method on each class (more Java)
+
+public class Person implements Clonable {  //Clonable just marks it, no extra methods, but allows clone "clone not supported exception"
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone(); // Just returns a shallow copy
+    }
+    
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        Person2 clone = (Person2) super.clone();
+
+
+        Date clonedBirthdate = (Date) getBirthdate().clone();
+        clone.setBirthdate(clonedBirthdate)
+
+
+        return clone;
+    }
+}
