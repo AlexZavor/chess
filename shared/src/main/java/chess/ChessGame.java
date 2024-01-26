@@ -1,9 +1,7 @@
 package chess;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -56,11 +54,8 @@ public class ChessGame {
         if(board.getPiece(startPosition) == null){
             return null;
         }
-        if(board.getPiece(startPosition).getTeamColor() != teamTurn){
-            return new ArrayList<ChessMove>();
-        }
         var moves = board.getPiece(startPosition).pieceMoves(board,startPosition);
-        var toRemove = new ArrayList<ChessMove>();
+        Collection<ChessMove> toRemove = new ArrayList<>();
 
         //Add in optional moves here
 
@@ -72,12 +67,12 @@ public class ChessGame {
                 takenPiece = board.getPiece(move.getEndPosition()).clone();
             }
             if(move.getPromotionPiece() != null){
-                board.addPiece(move.getEndPosition(), new ChessPiece(teamTurn, move.getPromotionPiece()));
+                board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
             }else{
                 board.addPiece(move.getEndPosition(), piece);
             }
             board.addPiece(move.getStartPosition(), null);
-            if(isInCheck(teamTurn)){
+            if(isInCheck(piece.getTeamColor())){
                 toRemove.add(move);
             }
             board.addPiece(move.getStartPosition(), piece);
@@ -97,6 +92,9 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         if (validMoves(move.getStartPosition()) != null && validMoves(move.getStartPosition()).contains(move)){
+            if(board.getPiece(move.getStartPosition()).getTeamColor() != getTeamTurn()){
+                throw new InvalidMoveException("Invalid move Called");
+            }
             if(move.getPromotionPiece() != null){
                 board.addPiece(move.getEndPosition(), new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(), move.getPromotionPiece()));
             }else{
@@ -133,6 +131,7 @@ public class ChessGame {
             for(int col = 1; col <= 8; col++){
                 ChessPosition pos = new ChessPosition(row, col);
                 if(board.getPiece(pos) != null && board.getPiece(pos).pieceMoves(board, pos).contains(new ChessMove(pos, kingPos, null))){
+                    //TODO: add in check for other promotions
                     return true;
                 }
             }
