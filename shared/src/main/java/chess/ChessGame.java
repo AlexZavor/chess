@@ -1,6 +1,9 @@
 package chess;
 
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -54,14 +57,34 @@ public class ChessGame {
             return null;
         }
         if(board.getPiece(startPosition).getTeamColor() != teamTurn){
-            return null;
+            return new ArrayList<ChessMove>();
         }
         var moves = board.getPiece(startPosition).pieceMoves(board,startPosition);
+        var toRemove = new ArrayList<ChessMove>();
 
         //Add in optional moves here
 
         for(ChessMove move : moves){
-
+            //try each move and see if result is check for our team
+            ChessPiece piece = board.getPiece(move.getStartPosition()).clone();
+            ChessPiece takenPiece = null;
+            if(board.getPiece(move.getEndPosition()) != null){
+                takenPiece = board.getPiece(move.getEndPosition()).clone();
+            }
+            if(move.getPromotionPiece() != null){
+                board.addPiece(move.getEndPosition(), new ChessPiece(teamTurn, move.getPromotionPiece()));
+            }else{
+                board.addPiece(move.getEndPosition(), piece);
+            }
+            board.addPiece(move.getStartPosition(), null);
+            if(isInCheck(teamTurn)){
+                toRemove.add(move);
+            }
+            board.addPiece(move.getStartPosition(), piece);
+            board.addPiece(move.getEndPosition(), takenPiece);
+        }
+        for(ChessMove move: toRemove){
+            moves.remove(move);
         }
         return moves;
     }
@@ -139,7 +162,7 @@ public class ChessGame {
             for(int col = 1; col <= 8; col++){
                 ChessPosition pos = new ChessPosition(row, col);
                 if(board.getPiece(pos) != null && board.getPiece(pos).getTeamColor() == teamColor){
-                    if(validMoves(pos) != null){
+                    if(validMoves(pos) != null && !validMoves(pos).isEmpty()){
                         return false;
                     }
                 }

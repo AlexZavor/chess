@@ -11,7 +11,7 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessPiece {
+public class ChessPiece implements Cloneable {
 
     private final ChessGame.TeamColor pieceColor;
     private final ChessPiece.PieceType type;
@@ -19,6 +19,15 @@ public class ChessPiece {
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+    }
+
+    @Override
+    public ChessPiece clone() {
+        try {
+            return (ChessPiece) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 
     /**
@@ -76,7 +85,7 @@ public class ChessPiece {
                 return rookMoves(board, myPosition);
             }
             default -> {
-                return new ArrayList<>();
+                return new HashSet<>();
             }
         }
     }
@@ -124,7 +133,7 @@ public class ChessPiece {
 
     //Checks all possible moves for bishop
     private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> moves = new ArrayList<>();
+        Collection<ChessMove> moves = new HashSet<>();
         var row = myPosition.getRow();
         var col = myPosition.getColumn();
         //up right check
@@ -164,7 +173,7 @@ public class ChessPiece {
 
     //Checks all possible moves for king
     private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition){
-        Collection<ChessMove> moves = new ArrayList<>();
+        Collection<ChessMove> moves = new HashSet<>();
         var row = myPosition.getRow();
         var col = myPosition.getColumn();
         checkMove(moves,board,myPosition,new ChessPosition(row+1,col+1));
@@ -180,7 +189,7 @@ public class ChessPiece {
 
     //Checks all possible moves for knight
     private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition){
-        Collection<ChessMove> moves = new ArrayList<>();
+        Collection<ChessMove> moves = new HashSet<>();
         var row = myPosition.getRow();
         var col = myPosition.getColumn();
         checkMove(moves,board,myPosition,new ChessPosition(row+2,col+1));
@@ -258,7 +267,7 @@ public class ChessPiece {
 
     //Checks all possible moves for queen
     private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> moves = new ArrayList<>(rookMoves(board, myPosition));
+        Collection<ChessMove> moves = new HashSet<>(rookMoves(board, myPosition));
         moves.addAll(bishopMoves(board, myPosition));
         return moves;
     }
@@ -302,6 +311,8 @@ public class ChessPiece {
         }
         return moves;
     }
+
+
 
 
     /* ------------- Testing functions ------------*/
