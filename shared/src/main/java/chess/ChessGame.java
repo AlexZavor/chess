@@ -50,7 +50,20 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        if(board.getPiece(startPosition) == null){
+            return null;
+        }
+        if(board.getPiece(startPosition).getTeamColor() != teamTurn){
+            return null;
+        }
+        var moves = board.getPiece(startPosition).pieceMoves(board,startPosition);
+
+        //Add in optional moves here
+
+        for(ChessMove move : moves){
+
+        }
+        return moves;
     }
 
     /**
@@ -60,13 +73,14 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if (validMoves(move.getStartPosition()).contains(move)){
+        if (validMoves(move.getStartPosition()) != null && validMoves(move.getStartPosition()).contains(move)){
             if(move.getPromotionPiece() != null){
                 board.addPiece(move.getEndPosition(), new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(), move.getPromotionPiece()));
             }else{
                 board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
             }
             board.addPiece(move.getStartPosition(), null);
+            teamTurn = teamTurn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
         }else{
             throw new InvalidMoveException("Invalid move Called");
         }
