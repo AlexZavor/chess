@@ -130,9 +130,11 @@ public class ChessGame {
         for(int row = 1; row <= 8; row++){
             for(int col = 1; col <= 8; col++){
                 ChessPosition pos = new ChessPosition(row, col);
-                if(board.getPiece(pos) != null && board.getPiece(pos).pieceMoves(board, pos).contains(new ChessMove(pos, kingPos, null))){
-                    //TODO: add in check for other promotions
-                    return true;
+                if(board.getPiece(pos) != null){
+                    if(board.getPiece(pos).pieceMoves(board, pos).contains(new ChessMove(pos, kingPos, null)) ||
+                        board.getPiece(pos).pieceMoves(board, pos).contains(new ChessMove(pos, kingPos, ChessPiece.PieceType.QUEEN))){
+                        return true;
+                    }
                 }
             }
         }
