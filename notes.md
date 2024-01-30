@@ -280,3 +280,78 @@ public class Person implements Clonable {  //Clonable just marks it, no extra me
         return clone;
     }
 }
+
+# Inner Classes
+
+### Why would we want this?
+class{
+    variables
+    methods
+    methods
+    inner class{
+        variables
+        methods
+    }
+    private innerClass();
+}
+perhaps for an *iterator*? implement it differently for the same idea on different objects
+### Kinds
+nested classes
+    mostly for keeping organized. hiding in the class
+    can be static, can be private. 
+        Static makes it separate from the class
+        without it can access see the members of the outer class instance.
+
+    keep things close to where they are used
+
+    What if its all really big?
+    What if you make the class.. right inside the method!
+    can just use the local variable, 
+        BUT, you have to treat the variable as final, or effectively final
+Ananomous
+    just is literally in the part where you make it
+    make a new object that works this way, doesn't matter what it is, won't use it again.
+    new Iterator() {        \\ Implementing an interface of iterator
+        required methods
+        required methods
+    };
+
+# Design Principles
+What do we want?
+Create systems that:
+    work
+    easy to understand
+    strong
+    reuseable
+
+Design is inherintally Iterative
+    design implement test repeat
+    designing all up front does not work!
+    begin with some design, make some
+
+### Abstraction
+dealing with complexity
+provide abstractions that model the *machine*
+    put data for a chess piece in a chess piece class
+
+sometimes represent real things
+    others aren't
+    http:, Database, Hashtable
+
+each abstraction are done with classes in Java
+Design public interface so people can interact how they like.
+
+Often can't represent all aspects of it.
+    represent what is relevant
+    based on how youll use it.
+
+### Good Names
+Naming things matters!
+if it has a bad name, then you have to dig through the code
+    Class - noun  (Cat)
+    Method - Verb (doThisThing)
+
+every abstraction shoud have one reason to live
+    are they easy to name? no? then it's doing too much.
+
+### Decomposition
