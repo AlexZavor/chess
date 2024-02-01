@@ -328,6 +328,18 @@ Design is inherintally Iterative
     design implement test repeat
     designing all up front does not work!
     begin with some design, make some
+    Data structure is important (vector or array?)
+
+Information Hiding
+    make how things work hidden
+    make what they do public
+    name things that hide the implementation
+    but work with interfaces
+
+Code Duplication
+    dont do it! or else fixing things causes fixing thing repeatedly (and missing things)
+    have one and called
+    inheritance
 
 ### Abstraction
 dealing with complexity
@@ -355,3 +367,36 @@ every abstraction shoud have one reason to live
     are they easy to name? no? then it's doing too much.
 
 ### Decomposition
+Helps tame complexity
+Make big problems into multiple small problems
+
+# Input/Output
+### Streams
+    read or write a file sequentially
+    Just read a stream of bytes, one byte at a time (file, input, database, piped(thread))
+    Input/OutputStream
+        reading and writing bytes
+    Reader / Writer
+        reading and writing chars
+        from Streams to Reader/Writer
+            InputStreamReader(takes stream)
+            OutputStreamWriter(takes stream)
+
+    **Filter Streams**
+        connect stream to stream
+            read bytes -> decrypt -> counting -> buffering
+### Scanner
+    attatch to file or stream. tokenized input (line, word, command)
+    default is white space
+    add in different tokens with a regular expression
+### File
+    Just read in the whole thing at once
+    represents a file. 
+        File file = new File("/directory/to/File");
+        if(file.exists());
+        file.createNewFile();
+        file.delete();
+### RandomAccessFile
+    use a file pointer to read wherever
+    .seek(long) (go to that point)
+    .skipBytes(int) (this + int)
