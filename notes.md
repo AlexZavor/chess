@@ -400,3 +400,38 @@ Make big problems into multiple small problems
     use a file pointer to read wherever
     .seek(long) (go to that point)
     .skipBytes(int) (this + int)
+
+# JSON
+The more modern and prefered data format for between computers (xml old)
+
+### Structure
+Suported Data type:
+    Objects {"name":"John", "type":"person"}
+    Arrays, ["testing", 2, 8]
+    Numbers, Strings, Bool, Null
+
+### Parser
+Most languages already have built in parsers
+    Serializers / Deserializer
+        Straight from JSON to Java objects (Gson)
+    Stream Parser
+        Tokenize things, passed to you one at a time. (have to rebuild yourself)
+    DOM
+        represents the data as a tree to navigate
+
+    must match class structure
+    Serialization -> Json
+
+
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    String jsonString = Gson.toJson(*object to Jsonfy*)
+
+    BufferedReader bufferedReader = new BufferedReader(file)
+    Gson gson = new Gson();
+    Obj. name = gson.fromJson(bufferedReader, Obj.class)
+
+
+# Phase 2
+Goal. design phase 3
+make diagrams to show the design of phase 3
+
