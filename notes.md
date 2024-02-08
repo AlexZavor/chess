@@ -434,4 +434,68 @@ Most languages already have built in parsers
 # Phase 2
 Goal. design phase 3
 make diagrams to show the design of phase 3
+Server - A program waiting for information from another computer (http)
 
+userData class
+authToken class
+gameData class
+
+DAO for each.
+
+Main server, 
+many handlers,
+request/result
+many serveces
+
+package (folder) with serveces
+sub package for requests
+sub package for results
+
+handelers not pictured in example (just json dealings)
+
+# HTTP
+Request and receve data from ohter computers
+who are we contacting? IP address
+DNS servers hold names for numbers (like a big contact book)
+
+Then you connect to a machine, but what do we want to do on that machine?
+port (like extention)
+
+https://www.google.com:443/images/blah blah blah
+(lang)  (Domain)     (port)    (path)
+
+Responce
+200: succsess
+300: information
+400: error. do better
+500: I messed up. oops
+pass headers, then data
+
+headers request authorization
+
+GET
+get some data
+headers 
+\n
+body return
+
+
+POST
+create some data
+headers
+\n
+request body
+
+responce may have data
+
+types (REST api):
+GET
+    nothing really in request
+POST
+    body included
+PUT
+    body included
+DELETE
+    no body included
+other
+    HEAD, OPTIONS, TRACE, PATCH
