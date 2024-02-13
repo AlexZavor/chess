@@ -499,3 +499,53 @@ DELETE
     no body included
 other
     HEAD, OPTIONS, TRACE, PATCH
+
+# Phase 3
+### SparkJava, uses Lambdas
+sending Http between data and server
+
+import spark.Spark;
+
+public class
+    public main()
+        Spark.get("/hello", (req,res) -> "Hello BYU!");
+
+Default port is 4567
+localhost:4567/hello
+
+Spark.prot(port);
+
+get
+post
+put
+delete
+
+lambda function should do more.
+request.
+    .body()     //get request body
+    .headers()  //recive all headers as set of strings
+    .header("...")  //get specific header
+response.
+    .body()     //Sets body
+    .status()   //sets status
+
+### Serving Static files
+    Spark.staticFiles.location("/directory")
+
+create a folder in server, mark as "resources directory"
+
+### Filters
+before("/pathfilter/*", (request, response) -> {
+    //check autheticated
+    ext.
+    runs before each route
+})
+
+### Install
+make a Maven project (package manager)
+make a Gradle project
+or just add it yourself.
+    file, project structure
+    modules, dependencies, +, library, from Maven
+    sparkjava
+
