@@ -35,14 +35,14 @@ System.out.printf("%d, %d, %d, %d \n", int, test, long1);
 
 ### Conversion
 int Integer.parseInt(String value)
-returns exception for incorrectly formated thing
-Wrapper class for all of the primitives. with parse methods
+returns exception for incorrectly formatted thing
+Wrapper class for all the primitives. with parse methods
 
 ### Strings
 Technically not primitives
 Immutable
-Concatinations always make a new string.
-String.format()                     // like printf() function for formating a string.
+Concatenations always make a new string.
+String.format()                     // like printf() function for formatting a string.
 String s = "Hello"                  // pointing to the same "hello" for the same string.
 String s = new String("Hello");     // Same literal. makes a copy. not really helpful
 String concatenation is slow
@@ -549,3 +549,49 @@ or just add it yourself.
     modules, dependencies, +, library, from Maven
     sparkjava
 
+### Design
+Server
+    holds all the hooks and runs spark
+Handlers
+    takes each of the hooks
+    deals with gson to and from
+    request/response objects needed
+Secedes
+    takes in requests, returns responses
+    holds the logic of what to do.
+Request/response
+    lots of simple classes (record?)
+    used for data passing
+Data Access
+    called from services, done with **interfaces**
+    will be changed later, for now just have static data
+    list
+    keep from forgetting?
+        static (eh. its temp anyway)
+        not new instances (change a lot)
+        another external class with the actual data.
+models
+    objects that represent our data bits
+    also maybe records
+
+# Curl
+kinda easy, command line server access
+raw returns from http
+-X POST (GET is default)
+-v Verbose
+-d body data '{"name":"joe"}'
+-H header data
+-o output response to file
+--data-binary @filename
+
+interesting for debugging
+
+# Write Quality code
+videos
+names are important
+methods should do one thing and should be clear with names
+returns void? action, verb phrase
+    worry about bad verbs (handle, perform, deal)
+### Methods
+Why write more?
+avoid code duplication, avoid deep nesting, decomposition
