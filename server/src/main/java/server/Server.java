@@ -33,7 +33,7 @@ public class Server {
                 (new UserHandler()).handleLogout(request, response)
                 ));
         Spark.delete("/db", ((request, response) ->
-                (new DatabaseHandler()).handleClear(request, response)
+                (new DatabaseHandler()).handleClear(response)
         ));
     }
 }
