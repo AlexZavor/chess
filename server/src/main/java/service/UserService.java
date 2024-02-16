@@ -3,13 +3,16 @@ package service;
 import model.*;
 import dataAccess.*;
 import request.*;
-import responce.*;
+import response.*;
 
 public class UserService {
     public RegisterResponse register(RegisterRequest request) {
         UserDAO users = new MemoryUserDAO();
         AuthDAO auths = new MemoryAuthDAO();
         UserData user = new UserData(request.username(), request.password(), request.email());
+        if(user.username() == null || user.password() == null || user.email() == null){
+            return new RegisterResponse(400, null, null, "Error: bad request");
+        }
         AuthData auth;
         try {
             users.createUser(user);

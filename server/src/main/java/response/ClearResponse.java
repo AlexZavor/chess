@@ -1,4 +1,4 @@
-package responce;
+package response;
 
 public record ClearResponse(int code) {
 }

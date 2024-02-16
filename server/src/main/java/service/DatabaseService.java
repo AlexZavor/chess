@@ -1,8 +1,7 @@
 package service;
 
 import dataAccess.*;
-import request.*;
-import responce.ClearResponse;
+import response.ClearResponse;
 
 public class DatabaseService {
     public ClearResponse clear() {
