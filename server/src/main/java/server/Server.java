@@ -34,6 +34,15 @@ public class Server {
                 ));
         Spark.delete("/db", ((request, response) ->
                 (new DatabaseHandler()).handleClear(response)
-        ));
+                ));
+        Spark.get("/game", ((request, response) ->
+                (new GameHandler()).handleListGames(request, response)
+                ));
+        Spark.post("/game", ((request, response) ->
+                (new GameHandler()).handleCreateGame(request, response)
+                ));
+        Spark.put("/game", ((request, response) ->
+                (new GameHandler()).handleJoinGame(request, response)
+                ));
     }
 }

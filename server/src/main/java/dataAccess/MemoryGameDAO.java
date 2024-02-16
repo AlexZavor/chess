@@ -13,12 +13,7 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public void createGame(GameData gameData) throws DataAccessException {
-        for (GameData game : games) {
-            if (game.gameID() == gameData.gameID()) {
-                throw new DataAccessException("game already exists");
-            }
-        }
+    public void createGame(GameData gameData) {
         games.add(gameData);
     }
 
@@ -43,6 +38,7 @@ public class MemoryGameDAO implements GameDAO{
             if (game.gameID() == gameID) {
                 games.remove(game);
                 games.add(gameData);
+                return;
             }
         }
         throw new DataAccessException("No matching game");
