@@ -1,6 +1,7 @@
 package server;
 
 import spark.*;
+import handler.*;
 
 public class Server {
 
@@ -22,9 +23,14 @@ public class Server {
     }
 
     private static void createRouts(){
-        Spark.get("/user", ((request, response) ->
-//                (new UserHandler()).handleRegister(request, response)
-                "Hello"
+        Spark.post("/user", ((request, response) ->
+                (new UserHandler()).handleRegister(request, response)
+                ));
+        Spark.post("/session", ((request, response) ->
+                (new UserHandler()).handleLogin(request, response)
+                ));
+        Spark.delete("/session", ((request, response) ->
+                (new UserHandler()).handleLogout(request, response)
                 ));
     }
 }
