@@ -32,5 +32,8 @@ public class Server {
         Spark.delete("/session", ((request, response) ->
                 (new UserHandler()).handleLogout(request, response)
                 ));
+        Spark.delete("/db", ((request, response) ->
+                (new DatabaseHandler()).handleClear(request, response)
+        ));
     }
 }

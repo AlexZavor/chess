@@ -39,7 +39,6 @@ public class UserService {
 
     public LogoutResponse logout(LogoutRequest request) {
         AuthDAO auths = new MemoryAuthDAO();
-        System.out.println(request.authToken() + "one two three");
         try {
             auths.deleteAuth(request.authToken());
         } catch (DataAccessException e) {
