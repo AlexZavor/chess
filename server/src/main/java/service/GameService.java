@@ -38,9 +38,10 @@ public class GameService {
     }
 
     public JoinGameResponse joinGame(String authToken, JoinGameRequest request) {
-        if(!request.playerColor().equals("BLACK") && !request.playerColor().equals("WHITE")){
+        if(!(request.playerColor() == null) && !request.playerColor().equals("BLACK") && !request.playerColor().equals("WHITE")){
             return new JoinGameResponse(400, "Error: bad request - NAME");
         }
+        System.out.println("joinGameCheck\n");
         AuthDAO auths = new MemoryAuthDAO();
         AuthData auth;
         try {
@@ -56,7 +57,9 @@ public class GameService {
         } catch (DataAccessException e) {
             return new JoinGameResponse(400, "Error: bad request - CAN'T FIND GAME");
         }
-        if(request.playerColor().equals("WHITE")){
+        if(request.playerColor() == null){
+                return new JoinGameResponse(200, null);
+        }else if(request.playerColor().equals("WHITE")){
             if(gameToCheck.whiteUsername() != null) {
                 return new JoinGameResponse(403, "Error: already taken");
             } else {
