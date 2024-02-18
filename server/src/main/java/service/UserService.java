@@ -5,14 +5,19 @@ import dataAccess.*;
 import request.*;
 import response.*;
 
-public class UserService {
+public class UserService extends Service {
+
     public RegisterResponse register(RegisterRequest request) {
-        UserDAO users = new MemoryUserDAO();
-        AuthDAO auths = new MemoryAuthDAO();
-        UserData user = new UserData(request.username(), request.password(), request.email());
-        if(user.username() == null || user.password() == null || user.email() == null){
+
+        // Check for bad Data fields
+        if(request.username() == null || request.password() == null || request.email() == null){
             return new RegisterResponse(400, null, null, "Error: bad request");
         }
+        UserData user = new UserData(request.username(), request.password(), request.email());
+
+        // Make user and authorization
+        AuthDAO auths = new MemoryAuthDAO();
+        UserDAO users = new MemoryUserDAO();
         AuthData auth;
         try {
             users.createUser(user);
@@ -20,16 +25,20 @@ public class UserService {
         } catch (DataAccessException e) {
             return new RegisterResponse(403, null, null, "Error: already taken");
         }
+
         return new RegisterResponse(200, request.username(), auth.authToken(), null);
     }
 
     public LoginResponse login(LoginRequest request) {
+
         UserDAO users = new MemoryUserDAO();
         AuthDAO auths = new MemoryAuthDAO();
         AuthData auth;
         try {
+            // Check user exists
             UserData user = users.getUser(request.username());
             if(user.password().equals(request.password())){
+                // Authorize if password matches
                 auth = auths.createAuth(request.username());
             }else{
                 throw new DataAccessException("Incorrect Password");
@@ -37,16 +46,20 @@ public class UserService {
         } catch (DataAccessException e) {
             return new LoginResponse(401, null, null, "Error: unauthorized");
         }
+
         return new LoginResponse(200, request.username(), auth.authToken(), null);
     }
 
     public LogoutResponse logout(LogoutRequest request) {
+
+        // Delete Authorization
         AuthDAO auths = new MemoryAuthDAO();
         try {
             auths.deleteAuth(request.authToken());
         } catch (DataAccessException e) {
             return new LogoutResponse(401, "Error: unauthorized");
         }
+
         return new LogoutResponse(200, null);
     }
 }
