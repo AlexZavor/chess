@@ -16,8 +16,6 @@ public class UserService extends Service {
         UserData user = new UserData(request.username(), request.password(), request.email());
 
         // Make user and authorization
-        AuthDAO auths = new MemoryAuthDAO();
-        UserDAO users = new MemoryUserDAO();
         AuthData auth;
         try {
             users.createUser(user);
@@ -31,8 +29,6 @@ public class UserService extends Service {
 
     public LoginResponse login(LoginRequest request) {
 
-        UserDAO users = new MemoryUserDAO();
-        AuthDAO auths = new MemoryAuthDAO();
         AuthData auth;
         try {
             // Check user exists
@@ -53,7 +49,6 @@ public class UserService extends Service {
     public LogoutResponse logout(LogoutRequest request) {
 
         // Delete Authorization
-        AuthDAO auths = new MemoryAuthDAO();
         try {
             auths.deleteAuth(request.authToken());
         } catch (DataAccessException e) {

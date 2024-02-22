@@ -5,6 +5,10 @@ import model.*;
 
 public class Service {
 
+    static final AuthDAO auths = new MemoryAuthDAO();
+    static final UserDAO users = new MemoryUserDAO();
+    static final GameDAO games = new MemoryGameDAO();
+
     protected boolean isAuthorized(String authToken){
 
         AuthDAO auths = new MemoryAuthDAO();

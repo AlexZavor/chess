@@ -15,7 +15,6 @@ public class GameService extends Service{
 
         // Check Authorization
         if(isAuthorized(request.authToken())){
-            GameDAO games = new MemoryGameDAO();
             return new ListGamesResponse(200, games.listGames(), null);
         }
 
@@ -25,13 +24,12 @@ public class GameService extends Service{
     public CreateGameResponse createGame(CreateGameRequest request) {
 
         // Check for bad input fields
-        if(request.gameName().isEmpty()){
+        if(request.gameName() == null || request.gameName().isEmpty()){
             return new CreateGameResponse(400, null, "Error: bad request");
         }
 
         // Check Authorization
         if(isAuthorized(request.authToken())){
-            GameDAO games = new MemoryGameDAO();
             int gameID = nextGameID;
             nextGameID++;
             GameData game = new GameData(gameID,null,null, request.gameName(), new ChessGame());
@@ -85,7 +83,6 @@ public class GameService extends Service{
         }
 
         // Update game
-        GameDAO games = new MemoryGameDAO();
         try {
             games.updateGame(request.gameID(), updatedGame);
         } catch (DataAccessException e) {

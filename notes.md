@@ -595,3 +595,45 @@ returns void? action, verb phrase
 ### Methods
 Why write more?
 avoid code duplication, avoid deep nesting, decomposition
+
+# Testing
+Writing tests is important, because assuming it all works is a bad idea
+
+System
+    run the entire thing
+Intermediate test
+    joining different units
+Unit tests
+    just small ones testing single things
+
+Automated tests are easy. so they get done. 
+    if you add a new feature, do you want to run all the tests again?
+    or would you rather click a button and add a little test code.
+
+Regression
+    if you fix something, but causes new errors, regression happens
+    tests do that
+
+Test driver
+    needs to know how to identify, run and tell if something went wrong.
+    needs to be easy.
+
+### Junit Testing Framework
+Pretty famous, works on a lot of languages (started in java)
+CppUnit, PyUnit, ext.
+write a method in a class that runs the test
+    @Test tells it it is a test
+    @BeforeEach tells it to run the method before each
+    @AfterAll ext. ext.
+    Assertions.assert methods to tell if something is right
+
+### Code coverage
+There is a test that looks at how many things are actually tested
+    line coverage - what lines are covered
+    Statement coverage - about the same
+    Branch coverage - checks between each branch of if/else ext.
+    Function coverage - checks each function.
+
+There is no "right" level of code coverage.
+Some companies have different levels.
+there are tools to check
