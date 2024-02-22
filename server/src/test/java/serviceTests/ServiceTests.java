@@ -48,13 +48,11 @@ public class ServiceTests {
     @Test
     @DisplayName("User Register - negative")
     public void RegisterBadUser(){
-        // Add new user
+        // Add new user - bad request
         RegisterResponse registerResponse = userService.register(new RegisterRequest("John Doe", null, "Jon@doe.mail"));
 
         // Check for fail response
-        if(registerResponse.code() == 200){
-            Assertions.fail();
-        }
+        Assertions.assertEquals(400, registerResponse.code());
 
         // Check if user exists correctly
         try{
@@ -69,22 +67,15 @@ public class ServiceTests {
         // Add new user
         RegisterResponse registerResponse = userService.register(new RegisterRequest("John Doe", "12345", "Jon@doe.mail"));
         // Logout
-        LogoutResponse responseLogout = userService.logout(new LogoutRequest(registerResponse.authToken()));
+        userService.logout(new LogoutRequest(registerResponse.authToken()));
         // Login
         LoginResponse responseLogin = userService.login(new LoginRequest("John Doe", "12345"));
 
-        // Check for any fail response
-        if(registerResponse.code() != 200){
-            Assertions.fail();
-        }else if(responseLogout.code() != 200){
-            Assertions.fail();
-        }else if(responseLogin.code() != 200){
-            Assertions.fail();
-        }
+        // Check for fail response
+        Assertions.assertEquals(200, responseLogin.code());
 
         // Check if user exists correctly
         try{
-            users.getUser("John Doe");
             auths.getAuth(responseLogin.authToken());
         } catch (DataAccessException e) {
             Assertions.fail();
@@ -97,22 +88,15 @@ public class ServiceTests {
         // Add new user
         RegisterResponse registerResponse = userService.register(new RegisterRequest("John Doe", "12345", "Jon@doe.mail"));
         // Logout
-        LogoutResponse responseLogout = userService.logout(new LogoutRequest(registerResponse.authToken()));
+        userService.logout(new LogoutRequest(registerResponse.authToken()));
         // Login - wrong password
         LoginResponse responseLogin = userService.login(new LoginRequest("John Doe", "54321"));
 
-        // Check for any fail response
-        if(registerResponse.code() != 200){
-            Assertions.fail();
-        }else if(responseLogout.code() != 200){
-            Assertions.fail();
-        }else if(responseLogin.code() == 200){
-            Assertions.fail();
-        }
+        // Check for fail response
+        Assertions.assertEquals(401, responseLogin.code());
 
         // Check if user exists correctly
         try{
-            users.getUser("John Doe");
             auths.getAuth(responseLogin.authToken());
             Assertions.fail();
         } catch (DataAccessException ignored) {
@@ -128,18 +112,9 @@ public class ServiceTests {
         LogoutResponse responseLogout = userService.logout(new LogoutRequest(registerResponse.authToken()));
 
         // Check for any fail response
-        if(registerResponse.code() != 200){
-            Assertions.fail();
-        }else if(responseLogout.code() != 200){
-            Assertions.fail();
-        }
+        Assertions.assertEquals(200, responseLogout.code());
 
-        // Check if user exists correctly, but auth token does not.
-        try{
-            users.getUser("John Doe");
-        } catch (DataAccessException ignored) {
-            Assertions.fail();
-        }
+        // Check that but auth token does not exist.
         try{
             auths.getAuth(registerResponse.authToken());
             Assertions.fail();
@@ -156,15 +131,10 @@ public class ServiceTests {
         LogoutResponse responseLogout = userService.logout(new LogoutRequest("abcdefghijklmno"));
 
         // Check for any fail response
-        if(registerResponse.code() != 200){
-            Assertions.fail();
-        }else if(responseLogout.code() == 200){
-            Assertions.fail();
-        }
+        Assertions.assertEquals(401, responseLogout.code());
 
-        // Check if user exists correctly
+        // Check that auth still exists correctly
         try{
-            users.getUser("John Doe");
             auths.getAuth(registerResponse.authToken());
         } catch (DataAccessException ignored) {
             Assertions.fail();
@@ -205,7 +175,7 @@ public class ServiceTests {
         CreateGameResponse createGameResponse = gameService.createGame(new CreateGameRequest(registerResponse.authToken(), null));
 
         // Check for any fail response
-        Assertions.assertNotEquals(200, createGameResponse.code());
+        Assertions.assertEquals(400, createGameResponse.code());
 
         // Check that game does not exist
         Assertions.assertEquals(new ListGamesResponse(200, new ArrayList<>(), null), gameService.listGames(new ListGamesRequest(registerResponse.authToken())));
