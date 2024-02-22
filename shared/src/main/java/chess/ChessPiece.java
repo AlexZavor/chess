@@ -111,15 +111,8 @@ public class ChessPiece implements Cloneable {
             //Out of bounds
             return;
         }
-        if (team == ChessGame.TeamColor.WHITE && checkedPos.getRow() == 8){
+        if ((team == ChessGame.TeamColor.WHITE && checkedPos.getRow() == 8) || (team == ChessGame.TeamColor.BLACK && checkedPos.getRow() == 1)){
             // add white promotion options
-            moves.add(new ChessMove(myPosition,checkedPos,PieceType.BISHOP));
-            moves.add(new ChessMove(myPosition,checkedPos,PieceType.KNIGHT));
-            moves.add(new ChessMove(myPosition,checkedPos,PieceType.QUEEN));
-            moves.add(new ChessMove(myPosition,checkedPos,PieceType.ROOK));
-        }
-        else if (team == ChessGame.TeamColor.BLACK && checkedPos.getRow() == 1){
-            // add black promotion options
             moves.add(new ChessMove(myPosition,checkedPos,PieceType.BISHOP));
             moves.add(new ChessMove(myPosition,checkedPos,PieceType.KNIGHT));
             moves.add(new ChessMove(myPosition,checkedPos,PieceType.QUEEN));
