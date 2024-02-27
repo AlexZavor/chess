@@ -637,3 +637,86 @@ There is a test that looks at how many things are actually tested
 There is no "right" level of code coverage.
 Some companies have different levels.
 there are tools to check
+
+# Relational Databases
+made of tables, that has collumns of each variable
+    including a primary key that is unique to each member
+Forien key- a primary key in another table that can relate members across tables.
+
+### Key types
+Key needs-
+    unique for every row.
+    every row has one.
+Primary-artifical
+    something just assigned without real meaning (1-'dracula')
+Primary-natural
+    also has real meaning, as long as it works as a key
+Composite 
+    multiple collumns that work together to be a key
+
+### Relationships
+one to one
+    person - SSN
+    mash them gothether?
+    or one table gets the primary key of the other
+One to many
+    Catagorys
+    take key from many and put in one table
+Many to many
+    who has done what?
+    create another table to put keys of both
+
+### Making a Relationship Diagram
+lines to show related, crows foot is many, dash is one
+circile means that it is optional.
+
+### Classes mapped to relationship diagrams
+make needed classes?
+make all classes?
+unification?
+depends on usage.
+
+# SQL
+Language for database operations
+data types:
+    CHAR(n)        fixed width character string
+    VARCHAR(n)     variable width string with max size n
+    BIT(n)         array of n bits
+    BIT VARYING(n) 
+    INTEGER and SMALLINT
+    FLOAT, REAL and DOUBLE PRECISION
+    NUMERIC(precision, scale) or DECIMAL(precision, scale)
+    BLOB            binary large object (image, sound, bin, ext)
+    CLOB            character large object (text doc)
+    DATE
+    TIME
+    TIME WITH TIME ZONE
+    TIMESTAMP
+    TIMESTAMP WITH TIME ZONE
+Create Tables
+    doing work rather than logic
+    create table book (
+        id integer not null primary key auto_increment,
+        title varchar(255) not null,
+        author varchar(255) not null,
+        genre varchar(32) not null,
+        category_id integer not null,
+        foreign key(genre) references genre(genre),
+        foreign key(category_id) references category(id)
+    );
+Drop Tables
+    drop table book;              // just goes for it, might have error
+    drop table if exists book;    // might be smarter, put at top for debugging to make sure you have an empty workspace
+
+Insert rows
+    insert into book 
+    (title, author, genre, category_id) values ('The work and the Glory', 'Gerald Lund', 'HistoricalFiction', 3);
+Update rows
+    if no WHERE clause, then it will effect all rows
+    UPDATE member
+    SET name = 'Chris Jones',
+        email_address = 'chris@gmail.com'
+    WHERE id = 3
+Delete rows
+    DELETE FROM member
+    WHERE id = 3
