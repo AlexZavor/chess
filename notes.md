@@ -720,3 +720,55 @@ Update rows
 Delete rows
     DELETE FROM member
     WHERE id = 3
+
+### JDBC
+SELECT column, column (* works)
+FROM table
+WHERE column = ""
+
+table.column
+no where clause? all of the above (for multiple tables makes cartesian projects)
+AND for where clause
+member.id = books_read.member_id AND book.id = books_read.book_id AND genre = "NonFiction"
+
+INNER JOIN (between FROM and WHERE) books_read ON member.id = books_read.member_id
+INNER JOIN book on books_read.book_id = book.id
+
+**Transactions**
+All or nothing is best.
+BEGIN TRANSACTION
+SQL statement 1;
+SQL statement 2;
+...
+COMMIT TRANSACTION; or ROLLBACK TRANSACTION;
+
+**In java**
+Java.SQL.*
+
+Load database driver
+    //not necessary anymore really
+    try{
+        Class.forName("org.sqlite.JDBC");
+    } catch (ClassNotFoundException e){ //error nonsense }
+open a database connection
+    make connectionURL string
+    Connection connection = null;
+    try catch{
+        Connection c = DriverManager.getConnection(URL)
+        either with resources, or make sure finally has close
+    }
+start a transaction
+    // for this class we can just leave auto commit on.
+    connection.setAutoCommit(false);
+execute queries and/or updates
+    Look on slides
+commit or rollback the transaction
+    connection.commit();
+    connection.rollback();
+close database connection
+    
+retrieving auto-increment ids
+    set flag in statement, then ask for it.
+
+Getting JDBC
+add to pom.xml to add it in.
