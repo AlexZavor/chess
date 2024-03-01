@@ -5,13 +5,11 @@ import model.*;
 
 public class Service {
 
-    static final AuthDAO auths = new MemoryAuthDAO();
-    static final UserDAO users = new MemoryUserDAO();
-    static final GameDAO games = new MemoryGameDAO();
+    static final AuthDAO auths = new SQLAuthDAO();
+    static final UserDAO users = new SQLUserDAO();
+    static final GameDAO games = new SQLGameDAO();
 
     protected boolean isAuthorized(String authToken){
-
-        AuthDAO auths = new MemoryAuthDAO();
         try {
             auths.getAuth(authToken);
         } catch (DataAccessException e) {
@@ -22,8 +20,6 @@ public class Service {
     }
 
     protected AuthData getAuthorization(String authToken){
-
-        AuthDAO auths = new MemoryAuthDAO();
         try {
             return auths.getAuth(authToken);
         } catch (DataAccessException e) {
@@ -32,8 +28,6 @@ public class Service {
     }
 
     protected GameData getGame(int gameID){
-
-        GameDAO games = new MemoryGameDAO();
         try {
             return games.getGame(gameID);
         } catch (DataAccessException e) {

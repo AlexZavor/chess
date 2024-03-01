@@ -12,3 +12,4 @@ out/
 ### Testing ###
 JavaExperements/
 server/src/main/resources/db.properties
+.idea/
