@@ -11,9 +11,9 @@ import java.util.ArrayList;
 
 public class ServiceTests {
 
-    AuthDAO auths = new MemoryAuthDAO();
-    UserDAO users = new MemoryUserDAO();
-    GameDAO games = new MemoryGameDAO();
+    AuthDAO auths = new SQLAuthDAO();
+    UserDAO users = new SQLUserDAO();
+    GameDAO games = new SQLGameDAO();
 
     UserService userService = new UserService();
     GameService gameService = new GameService();
