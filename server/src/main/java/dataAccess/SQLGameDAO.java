@@ -22,7 +22,7 @@ public class SQLGameDAO implements GameDAO{
                           `gameID` int NOT NULL,
                           `whiteUsername` varchar(128),
                           `blackUsername` varchar(128),
-                          `gameName` varchar(128) NOT NULL,
+                          `gameName` varchar(128),
                           `game` TEXT,
                           PRIMARY KEY (`gameID`)
                         )
@@ -49,7 +49,7 @@ public class SQLGameDAO implements GameDAO{
                 ps.executeUpdate();
             }
         } catch (SQLException | DataAccessException e) {
-            System.out.println("Failed to clear Users");
+            System.out.println("Failed to clear Games");
         }
     }
 

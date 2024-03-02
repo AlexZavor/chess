@@ -15,8 +15,8 @@ public class GameHandler  extends Handler{
     }
 
     public String handleCreateGame(Request request, Response response){
-        CreateGameRequest serviceRequest = new CreateGameRequest(getAuthToken(request), gson.toJson(request.body()));
-        CreateGameResponse serviceResponse = (new GameService()).createGame( serviceRequest );
+        CreateGameRequest serviceRequest = gson.fromJson(request.body(), CreateGameRequest.class);
+        CreateGameResponse serviceResponse = (new GameService()).createGame( getAuthToken(request), serviceRequest );
         response.status(serviceResponse.code());
         return gson.toJson( serviceResponse );
     }

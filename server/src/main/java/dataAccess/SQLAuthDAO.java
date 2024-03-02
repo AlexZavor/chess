@@ -6,6 +6,7 @@ import java.util.UUID;
 import model.AuthData;
 
 public class SQLAuthDAO implements AuthDAO{
+
     public SQLAuthDAO() {
         try {
             DatabaseManager.createDatabase();
@@ -15,7 +16,7 @@ public class SQLAuthDAO implements AuthDAO{
                         CREATE TABLE IF NOT EXISTS  auths (
                           `username` varchar(128) NOT NULL,
                           `authToken` varchar(256) NOT NULL,
-                          PRIMARY KEY (`username`)
+                          PRIMARY KEY (`authToken`)
                         )
                         """
                 };
@@ -55,7 +56,6 @@ public class SQLAuthDAO implements AuthDAO{
                 if(ps.executeUpdate() != 1) {
                     throw new DataAccessException("Can't Create auth");
                 }
-
             }
         } catch (SQLException | DataAccessException e) {
             System.out.println(e.getMessage());

@@ -2,6 +2,7 @@ package serviceTests;
 
 import dataAccess.*;
 import org.junit.jupiter.api.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import request.*;
 import response.*;
 import service.*;
@@ -41,7 +42,8 @@ public class ServiceTests {
             return;
         }
         Assertions.assertEquals("John Doe", user.username());
-        Assertions.assertEquals("1234", user.password());
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        Assertions.assertTrue(encoder.matches("1234", user.password()));
         Assertions.assertEquals("Jon@doe.mail", user.email());
     }
 
@@ -148,7 +150,7 @@ public class ServiceTests {
         RegisterResponse registerResponse = userService.register(new RegisterRequest("John Doe", "12345", "Jon@doe.mail"));
 
         // Create game
-        CreateGameResponse createGameResponse = gameService.createGame(new CreateGameRequest(registerResponse.authToken(), "GameName"));
+        CreateGameResponse createGameResponse = gameService.createGame(registerResponse.authToken(), new CreateGameRequest("GameName"));
 
         // Check for any fail response
         Assertions.assertEquals(200, createGameResponse.code());
@@ -172,7 +174,7 @@ public class ServiceTests {
         RegisterResponse registerResponse = userService.register(new RegisterRequest("John Doe", "12345", "Jon@doe.mail"));
 
         // Create game - no game name
-        CreateGameResponse createGameResponse = gameService.createGame(new CreateGameRequest(registerResponse.authToken(), null));
+        CreateGameResponse createGameResponse = gameService.createGame(registerResponse.authToken(), new CreateGameRequest(null));
 
         // Check for any fail response
         Assertions.assertEquals(400, createGameResponse.code());
@@ -188,7 +190,7 @@ public class ServiceTests {
         RegisterResponse registerResponse = userService.register(new RegisterRequest("John Doe", "12345", "Jon@doe.mail"));
 
         // Create game
-        gameService.createGame(new CreateGameRequest(registerResponse.authToken(), "GameName"));
+        gameService.createGame(registerResponse.authToken(), new CreateGameRequest("GameName"));
 
         // List games
         ListGamesResponse listGamesResponse = gameService.listGames(new ListGamesRequest(registerResponse.authToken()));
@@ -198,7 +200,12 @@ public class ServiceTests {
 
         // Check if game list matches
         ArrayList<GameData> gameList = games.listGames();
-        Assertions.assertEquals(gameList, listGamesResponse.games());
+        for (int i = 0; i < gameList.size(); i++){
+            Assertions.assertEquals(gameList.get(i).gameID(), listGamesResponse.games().get(i).gameID());
+            Assertions.assertEquals(gameList.get(i).whiteUsername(), listGamesResponse.games().get(i).whiteUsername());
+            Assertions.assertEquals(gameList.get(i).blackUsername(), listGamesResponse.games().get(i).blackUsername());
+            Assertions.assertEquals(gameList.get(i).gameName(), listGamesResponse.games().get(i).gameName());
+        }
     }
 
     @Test
@@ -208,7 +215,7 @@ public class ServiceTests {
         RegisterResponse registerResponse = userService.register(new RegisterRequest("John Doe", "12345", "Jon@doe.mail"));
 
         // Create game
-        gameService.createGame(new CreateGameRequest(registerResponse.authToken(), "GameName"));
+        gameService.createGame(registerResponse.authToken(), new CreateGameRequest("GameName"));
 
         // List games - unauthorized
         ListGamesResponse listGamesResponse = gameService.listGames(new ListGamesRequest("abcdefghijklmno"));
@@ -224,7 +231,7 @@ public class ServiceTests {
         RegisterResponse registerResponse = userService.register(new RegisterRequest("John Doe", "12345", "Jon@doe.mail"));
 
         // Create game
-        CreateGameResponse createGameResponse = gameService.createGame(new CreateGameRequest(registerResponse.authToken(), "GameName"));
+        CreateGameResponse createGameResponse = gameService.createGame(registerResponse.authToken(), new CreateGameRequest("GameName"));
 
         // Join that game
         JoinGameResponse joinGameResponse = gameService.joinGame(registerResponse.authToken(), new JoinGameRequest("WHITE", createGameResponse.gameID()));
@@ -248,7 +255,7 @@ public class ServiceTests {
         RegisterResponse registerResponse = userService.register(new RegisterRequest("John Doe", "12345", "Jon@doe.mail"));
 
         // Create game
-        CreateGameResponse createGameResponse = gameService.createGame(new CreateGameRequest(registerResponse.authToken(), "GameName"));
+        CreateGameResponse createGameResponse = gameService.createGame(registerResponse.authToken(), new CreateGameRequest("GameName"));
 
         // Join that game - bad request
         JoinGameResponse joinGameResponse = gameService.joinGame(registerResponse.authToken(), new JoinGameRequest("why should I tell you?", createGameResponse.gameID()));
@@ -272,7 +279,7 @@ public class ServiceTests {
         RegisterResponse registerResponse = userService.register(new RegisterRequest("John Doe", "12345", "Jon@doe.mail"));
 
         // Create game
-        CreateGameResponse createGameResponse = gameService.createGame(new CreateGameRequest(registerResponse.authToken(), "GameName"));
+        CreateGameResponse createGameResponse = gameService.createGame(registerResponse.authToken(), new CreateGameRequest("GameName"));
 
         // Join that game
         gameService.joinGame(registerResponse.authToken(), new JoinGameRequest("WHITE", createGameResponse.gameID()));

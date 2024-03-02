@@ -21,7 +21,7 @@ public class GameService extends Service{
         return new ListGamesResponse(401, null, "Error: unauthorized");
     }
 
-    public CreateGameResponse createGame(CreateGameRequest request) {
+    public CreateGameResponse createGame(String authToken, CreateGameRequest request) {
 
         // Check for bad input fields
         if(request.gameName() == null || request.gameName().isEmpty()){
@@ -29,7 +29,7 @@ public class GameService extends Service{
         }
 
         // Check Authorization
-        if(isAuthorized(request.authToken())){
+        if(isAuthorized(authToken)){
             int gameID = nextGameID;
             nextGameID++;
             GameData game = new GameData(gameID,null,null, request.gameName(), new ChessGame());

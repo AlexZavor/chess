@@ -2,6 +2,7 @@ package service;
 
 import model.*;
 import dataAccess.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import request.*;
 import response.*;
 
@@ -33,7 +34,8 @@ public class UserService extends Service {
         try {
             // Check user exists
             UserData user = users.getUser(request.username());
-            if(user.password().equals(request.password())){
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            if(encoder.matches(request.password(), user.password())){
                 // Authorize if password matches
                 auth = auths.createAuth(request.username());
             }else{

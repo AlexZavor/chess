@@ -2,8 +2,11 @@ package dataAccess;
 
 import java.sql.*;
 import model.UserData;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class SQLUserDAO implements UserDAO {
+    static private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
     public SQLUserDAO() {
         try {
             DatabaseManager.createDatabase();
@@ -49,7 +52,7 @@ public class SQLUserDAO implements UserDAO {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1,user.username());
-                ps.setString(2,user.password());
+                ps.setString(2,encoder.encode(user.password()));
                 ps.setString(3,user.email());
                 if(ps.executeUpdate() != 1) {
                     throw new DataAccessException("Can't Create user");
