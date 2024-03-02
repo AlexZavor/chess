@@ -9,15 +9,14 @@ import model.GameData;
 
 import java.util.ArrayList;
 
-public class SQLGameDAO implements GameDAO{
+public class SQLGameDAO extends SQLDAO implements GameDAO{
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public SQLGameDAO() {
         try {
             DatabaseManager.createDatabase();
-            try (var conn = DatabaseManager.getConnection()) {
-                String[] createStatements = {
-                        """
+            String[] createStatements = {
+                    """
                         CREATE TABLE IF NOT EXISTS  games (
                           `gameID` int NOT NULL,
                           `whiteUsername` varchar(128),
@@ -27,15 +26,8 @@ public class SQLGameDAO implements GameDAO{
                           PRIMARY KEY (`gameID`)
                         )
                         """
-                };
-                for (var statement : createStatements) {
-                    try (var preparedStatement = conn.prepareStatement(statement)) {
-                        preparedStatement.executeUpdate();
-                    }
-                }
-            } catch (SQLException ex) {
-                throw new DataAccessException("Unable to configure games Database");
-            }
+            };
+            createTable(createStatements);
         } catch (DataAccessException e) {
             System.out.println(e.getMessage());
         }
@@ -43,14 +35,7 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public void clear() {
-        var statement = "TRUNCATE games";
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement)) {
-                ps.executeUpdate();
-            }
-        } catch (SQLException | DataAccessException e) {
-            System.out.println("Failed to clear Games");
-        }
+        clearTable("games");
     }
 
     @Override

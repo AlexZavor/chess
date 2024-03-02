@@ -4,15 +4,14 @@ import java.sql.*;
 import model.UserData;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-public class SQLUserDAO implements UserDAO {
+public class SQLUserDAO extends SQLDAO implements UserDAO {
     static private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     public SQLUserDAO() {
         try {
             DatabaseManager.createDatabase();
-            try (var conn = DatabaseManager.getConnection()) {
-                String[] createStatements = {
-                        """
+            String[] createStatements = {
+                    """
                         CREATE TABLE IF NOT EXISTS  users (
                           `username` varchar(128) NOT NULL,
                           `password` varchar(256) NOT NULL,
@@ -20,15 +19,8 @@ public class SQLUserDAO implements UserDAO {
                           PRIMARY KEY (`username`)
                         )
                         """
-                };
-                for (var statement : createStatements) {
-                    try (var preparedStatement = conn.prepareStatement(statement)) {
-                        preparedStatement.executeUpdate();
-                    }
-                }
-            } catch (SQLException ex) {
-                throw new DataAccessException("Unable to configure User Database");
-            }
+            };
+            createTable(createStatements);
         } catch (DataAccessException e) {
             System.out.println(e.getMessage());
         }
@@ -36,14 +28,7 @@ public class SQLUserDAO implements UserDAO {
 
     @Override
     public void clear() {
-        var statement = "TRUNCATE users";
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement)) {
-                ps.executeUpdate();
-            }
-        } catch (SQLException | DataAccessException e) {
-            System.out.println("Failed to clear Users");
-        }
+        clearTable("users");
     }
 
     @Override

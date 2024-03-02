@@ -5,29 +5,21 @@ import java.util.UUID;
 
 import model.AuthData;
 
-public class SQLAuthDAO implements AuthDAO{
+public class SQLAuthDAO extends SQLDAO implements AuthDAO {
 
     public SQLAuthDAO() {
         try {
             DatabaseManager.createDatabase();
-            try (var conn = DatabaseManager.getConnection()) {
-                String[] createStatements = {
-                        """
+            String[] createStatements = {
+                    """
                         CREATE TABLE IF NOT EXISTS  auths (
                           `username` varchar(128) NOT NULL,
                           `authToken` varchar(256) NOT NULL,
                           PRIMARY KEY (`authToken`)
                         )
                         """
-                };
-                for (var statement : createStatements) {
-                    try (var preparedStatement = conn.prepareStatement(statement)) {
-                        preparedStatement.executeUpdate();
-                    }
-                }
-            } catch (SQLException ex) {
-                throw new DataAccessException("Unable to configure Auth Database");
-            }
+            };
+            createTable(createStatements);
         } catch (DataAccessException e) {
             System.out.println(e.getMessage());
         }
@@ -35,14 +27,7 @@ public class SQLAuthDAO implements AuthDAO{
 
     @Override
     public void clear() {
-        var statement = "TRUNCATE auths";
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement)) {
-                ps.executeUpdate();
-            }
-        } catch (SQLException | DataAccessException e) {
-            System.out.println("Failed to clear Auths");
-        }
+        clearTable("auths");
     }
 
     @Override
