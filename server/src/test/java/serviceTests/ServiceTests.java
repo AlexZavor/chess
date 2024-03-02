@@ -235,7 +235,7 @@ public class ServiceTests {
         // Check if game data matches
         try {
             GameData game = games.getGame(createGameResponse.gameID());
-            Assertions.assertEquals(game.whiteUsername(), "John Doe");
+            Assertions.assertEquals("John Doe", game.whiteUsername());
         } catch (DataAccessException e) {
             Assertions.fail();
         }
@@ -280,7 +280,7 @@ public class ServiceTests {
         // Check if game data matches
         try {
             GameData game = games.getGame(createGameResponse.gameID());
-            Assertions.assertEquals(game.whiteUsername(), "John Doe");
+            Assertions.assertEquals("John Doe", game.whiteUsername());
             users.getUser("John Doe");
             auths.getAuth(registerResponse.authToken());
         } catch (DataAccessException e) {
