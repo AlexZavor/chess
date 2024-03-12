@@ -772,3 +772,9 @@ retrieving auto-increment ids
 
 Getting JDBC
 add to pom.xml to add it in.
+
+# Phase 5: Pregame
+Terminal, spec, API
+Drawing text to screen to draw each token. a lot like it. 
+two UIs, pre logged in, post logged in
+thursday connecting to API.
