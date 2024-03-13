@@ -1,7 +1,12 @@
 package ui;
 
+import chess.ChessGame;
+import model.GameData;
+
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -10,6 +15,7 @@ public class LoggedInUI {
 
     private final String username;
     private final String authToken;
+    private final ArrayList<Integer> gameIDs = new ArrayList<>();
 
     private final PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
     private final Scanner scanner = new Scanner(System.in);
@@ -38,12 +44,15 @@ public class LoggedInUI {
                     break;
                 case 4:
                     out.println(SET_TEXT_COLOR_BLUE + "--Games--");
+                    listGames();
                     break;
                 case 5:
                     out.println(SET_TEXT_COLOR_BLUE + "--Join Game--");
+                    joinGame();
                     break;
                 case 6:
                     out.println(SET_TEXT_COLOR_BLUE + "--Join as Observer--");
+                    joinObserver();
                     break;
                 default:
                     out.println(SET_TEXT_COLOR_RED + "Please Select from the options");
@@ -83,6 +92,71 @@ public class LoggedInUI {
     }
 
     private void createGame(){
+        var gameName = getString("Game Name");
+        out.println(SET_TEXT_COLOR_BLUE + "Made game - " + gameName);
+        //TODO: actually make it request
+    }
+
+    private void listGames(){
+        List<GameData> games = new ArrayList<>();
+        games.add(new GameData(2, null, null, "Test Game", new ChessGame()));
+        //TODO: actually make it request
+        int i = 0;
+        gameIDs.clear();
+        for(var game : games){
+            out.println(i + " - " + game.gameName() +
+                        " : white player - " + game.whiteUsername() +
+                        " black player - " + game.blackUsername());
+            gameIDs.add(game.gameID());
+        }
+    }
+
+    private void joinGame(){
+        listGames();
+        out.println(SET_TEXT_COLOR_BLUE + "Enter number of Game to join");
+        int gameIndex;
+        while(true){
+            gameIndex = getInput();
+            if(gameIndex < gameIDs.size()){
+                break;
+            } else {
+                out.println(SET_TEXT_COLOR_RED + "Please enter valid game number");
+            }
+        }
+        int gameID = gameIDs.get(gameIndex);
+        GameData game = new GameData(2, "Test", null, "game", new ChessGame());
+        //TODO: actually make it request
+
+        String player;
+        while (true){
+            player = getString("What position? [WHITE|BLACK]");
+            if((player.equals("WHITE") && game.whiteUsername().isEmpty()) ||
+                (player.equals("BLACK") && game.blackUsername().isEmpty())){
+                break;
+            } else {
+                out.println(SET_TEXT_COLOR_RED + "Please enter valid selection [WHITE|BLACK]");
+            }
+        }
+
+        //startGame(game);
+    }
+
+    private void joinObserver(){
+        listGames();
+        out.println(SET_TEXT_COLOR_BLUE + "Enter number of Game to join");
+        int gameIndex;
+        while(true){
+            gameIndex = getInput();
+            if(gameIndex < gameIDs.size()-1){
+                break;
+            } else {
+                out.println(SET_TEXT_COLOR_RED + "Please enter valid game number");
+            }
+        }
+        int gameID = gameIDs.get(gameIndex);
+        ChessGame game = new ChessGame();
+        //TODO: actually make it request
+        //startGame(game);
     }
 
     private int getInput(){
