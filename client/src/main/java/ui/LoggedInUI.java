@@ -138,7 +138,7 @@ public class LoggedInUI {
             }
         }
 
-        //startGame(game);
+        startGame(game);
     }
 
     private void joinObserver(){
@@ -154,9 +154,9 @@ public class LoggedInUI {
             }
         }
         int gameID = gameIDs.get(gameIndex);
-        ChessGame game = new ChessGame();
+        GameData game = new GameData(2, "Test", null, "game", new ChessGame());
         //TODO: actually make it request
-        //startGame(game);
+        startGame(game);
     }
 
     private int getInput(){
@@ -185,4 +185,10 @@ public class LoggedInUI {
         }
     }
 
+    private void startGame(GameData game){
+        GameUI gameUI = new GameUI(game);
+        gameUI.run();
+        printHeader();
+        printOptions();
+    }
 }
