@@ -129,16 +129,27 @@ public class LoggedInUI {
 
         String player;
         while (true){
-            player = getString("What position? [WHITE|BLACK]");
-            if((player.equals("WHITE") && game.whiteUsername().isEmpty()) ||
-                (player.equals("BLACK") && game.blackUsername().isEmpty())){
+            String options;
+            if(game.whiteUsername() == null && game.blackUsername() == null){
+                options = "[WHITE|BLACK]";
+            }else if (game.whiteUsername() == null){
+                options = "[WHITE]";
+            }else if (game.blackUsername() == null){
+                options = "[BLACK]";
+            }else{
+                out.println(SET_TEXT_COLOR_RED + "Game Already full");
+                break;
+            }
+            player = getString("What position? " + options);
+            if((player.equalsIgnoreCase("white") && game.whiteUsername() == null) ||
+                (player.equalsIgnoreCase("black") && game.blackUsername() == null)){
+                startGame(game);
                 break;
             } else {
-                out.println(SET_TEXT_COLOR_RED + "Please enter valid selection [WHITE|BLACK]");
+                out.println(SET_TEXT_COLOR_RED + "Please enter valid selection " + options);
             }
         }
 
-        startGame(game);
     }
 
     private void joinObserver(){
@@ -147,7 +158,7 @@ public class LoggedInUI {
         int gameIndex;
         while(true){
             gameIndex = getInput();
-            if(gameIndex < gameIDs.size()-1){
+            if(gameIndex < gameIDs.size()){
                 break;
             } else {
                 out.println(SET_TEXT_COLOR_RED + "Please enter valid game number");

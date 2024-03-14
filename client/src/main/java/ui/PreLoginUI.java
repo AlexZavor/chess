@@ -12,6 +12,7 @@ public class PreLoginUI {
     private final Scanner scanner = new Scanner(System.in);
 
     public void run(){
+        out.print(RESET_BG_COLOR);
         printHeader();
         printOptions();
         boolean quit = false;
