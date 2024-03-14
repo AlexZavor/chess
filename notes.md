@@ -778,3 +778,10 @@ Terminal, spec, API
 Drawing text to screen to draw each token. a lot like it. 
 two UIs, pre logged in, post logged in
 thursday connecting to API.
+
+API Calls
+    connect to server. talk through bytes
+Code examples on slides. very good.
+
+# Logging
+Built in loggers, make a logger, set a priority level.

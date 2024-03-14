@@ -130,7 +130,7 @@ public class GameUI {
     }
 
     private void setHeader(){
-        out.print(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE);
+        out.print(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_WHITE);
     }
     private void setWhite(){
         out.print(SET_BG_COLOR_WHITE);
