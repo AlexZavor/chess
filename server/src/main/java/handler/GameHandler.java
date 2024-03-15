@@ -11,6 +11,7 @@ public class GameHandler  extends Handler{
         ListGamesRequest serviceRequest = new ListGamesRequest(getAuthToken(request));
         ListGamesResponse serviceResponse = (new GameService()).listGames( serviceRequest );
         response.status(serviceResponse.code());
+        response.body(gson.toJson( serviceResponse ));
         return gson.toJson( serviceResponse );
     }
 
@@ -18,6 +19,7 @@ public class GameHandler  extends Handler{
         CreateGameRequest serviceRequest = gson.fromJson(request.body(), CreateGameRequest.class);
         CreateGameResponse serviceResponse = (new GameService()).createGame( getAuthToken(request), serviceRequest );
         response.status(serviceResponse.code());
+        response.body(gson.toJson( serviceResponse ));
         return gson.toJson( serviceResponse );
     }
 
@@ -25,6 +27,7 @@ public class GameHandler  extends Handler{
         JoinGameRequest serviceRequest = gson.fromJson(request.body(), JoinGameRequest.class );
         JoinGameResponse serviceResponse = (new GameService()).joinGame(request.headers("authorization"), serviceRequest );
         response.status(serviceResponse.code());
+        response.body(gson.toJson( serviceResponse ));
         return gson.toJson( serviceResponse );
     }
 }

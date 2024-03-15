@@ -68,6 +68,11 @@
             <artifactId>server</artifactId>
             <version>1.0.0</version>
             <scope>test</scope>
+
+            <groupId>edu.byu.cs240</groupId>
+            <artifactId>server</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

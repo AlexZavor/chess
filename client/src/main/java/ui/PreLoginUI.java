@@ -1,17 +1,21 @@
 package ui;
 
+import request.*;
+import response.*;
+import serverFacade.ServerFacade;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
-
 import static ui.EscapeSequences.*;
 
 public class PreLoginUI {
 
     private final PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
     private final Scanner scanner = new Scanner(System.in);
+    private ServerFacade server;
 
-    public void run(){
+    public void run(int port){
+        server = new ServerFacade(port);
         out.print(RESET_BG_COLOR);
         printHeader();
         printOptions();
@@ -69,18 +73,31 @@ public class PreLoginUI {
     private void login(){
         var username = getString("Username");
         var password = getString("Password");
-        //TODO: actually make it request
-        var authToken = "test";
-        runLoggedIn(username, authToken);
+        LoginResponse response = server.login(new LoginRequest(username,password));
+
+        if(response.code() == 200){
+            var authToken = response.authToken();
+            runLoggedIn(username, authToken);
+        }else{
+            out.println(SET_TEXT_COLOR_RED + "Failed to Login");
+            printOptions();
+        }
     }
 
     private void register(){
         var username = getString("Username");
         var password = getString("Password");
         var email = getString("E-mail");
-        //TODO: actually make it request
-        var authToken = "test";
-        runLoggedIn(username, authToken);
+        RegisterResponse response = server.register(new RegisterRequest(username,password,email));
+
+        if(response.code() == 200){
+            var authToken = response.authToken();
+            runLoggedIn(username, authToken);
+        }else if(response.code() == 403){
+            out.println(SET_TEXT_COLOR_RED + "Username Already Taken");
+        }else{
+            out.println(SET_TEXT_COLOR_RED + "Failed to Register user");
+        }
     }
 
     private int getInput(){
