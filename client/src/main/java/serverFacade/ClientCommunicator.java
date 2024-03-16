@@ -27,36 +27,59 @@ public class ClientCommunicator {
         return gson.fromJson(doPush("/session", "", gson.toJson(request)), LoginResponse.class);
     }
 
-    public void doGet(String urlString) throws IOException {
-        URL url = new URL(urlString);
+    public LogoutResponse doLogout(LogoutRequest request) throws IOException {
+        return gson.fromJson(doDelete("/session", request.authToken(), gson.toJson(request)), LogoutResponse.class);
+    }
+
+    public ListGamesResponse doListGames(ListGamesRequest request) throws IOException {
+        return gson.fromJson(doGet("/game", request.authToken()), ListGamesResponse.class);
+    }
+
+    public CreateGameResponse doCreateGame(CreateGameRequest request, String authToken) throws IOException {
+        return gson.fromJson(doPost("/game", authToken, gson.toJson(request)), CreateGameResponse.class);
+    }
+
+    public JoinGameResponse doJoinGame(JoinGameRequest request, String authToken) throws IOException {
+        return gson.fromJson(doPut("/game", authToken, gson.toJson(request)), JoinGameResponse.class);
+    }
+
+    private String doGet(String URLPath, String authToken) throws IOException {
+        URL url = new URL("http://localhost:" + port + URLPath);
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         connection.setReadTimeout(5000);
         connection.setRequestMethod("GET");
 
-        // Set HTTP request headers, if necessary
-        // connection.addRequestProperty("Accept", "text/html");
-        // connection.addRequestProperty("Authorization", "fjaklc8sdfjklakl");
+        // Set HTTP request headers
+        connection.addRequestProperty("authorization", authToken);
 
         connection.connect();
 
-        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            // Get HTTP response headers, if necessary
-            // Map<String, List<String>> headers = connection.getHeaderFields();
+        StringBuilder stringBuilder = getResponse(connection);
+        return stringBuilder.toString();
+    }
 
-            // OR
+    private String doPost(String URLPath, String authToken, String body) throws IOException {
+        URL url = new URL("http://localhost:" + port + URLPath);
 
-            //connection.getHeaderField("Content-Length");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-            InputStream responseBody = connection.getInputStream();
-            // Read and process response body from InputStream ...
-        } else {
-            // SERVER RETURNED AN HTTP ERROR
+        connection.setReadTimeout(5000);
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
 
-            InputStream responseBody = connection.getErrorStream();
-            // Read and process error response body from InputStream ...
+        // Set HTTP request headers
+        connection.addRequestProperty("authorization", authToken);
+
+        connection.connect();
+
+        try(OutputStream requestBody = connection.getOutputStream()) {
+            // Write request body to OutputStream ...
+            requestBody.write(body.getBytes());
         }
+        StringBuilder stringBuilder = getResponse(connection);
+        return stringBuilder.toString();
     }
 
     private String doPush(String URLPath, String authToken, String body) throws IOException {
@@ -66,6 +89,50 @@ public class ClientCommunicator {
 
         connection.setReadTimeout(5000);
         connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
+
+        // Set HTTP request headers
+        connection.addRequestProperty("authorization", authToken);
+
+        connection.connect();
+
+        try(OutputStream requestBody = connection.getOutputStream()) {
+            // Write request body to OutputStream ...
+            requestBody.write(body.getBytes());
+        }
+        StringBuilder stringBuilder = getResponse(connection);
+        return stringBuilder.toString();
+    }
+
+    private String doPut(String URLPath, String authToken, String body) throws IOException {
+        URL url = new URL("http://localhost:" + port + URLPath);
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setReadTimeout(5000);
+        connection.setRequestMethod("PUT");
+        connection.setDoOutput(true);
+
+        // Set HTTP request headers
+        connection.addRequestProperty("authorization", authToken);
+
+        connection.connect();
+
+        try(OutputStream requestBody = connection.getOutputStream()) {
+            // Write request body to OutputStream ...
+            requestBody.write(body.getBytes());
+        }
+        StringBuilder stringBuilder = getResponse(connection);
+        return stringBuilder.toString();
+    }
+
+    private String doDelete(String URLPath, String authToken, String body) throws IOException {
+        URL url = new URL("http://localhost:" + port + URLPath);
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setReadTimeout(5000);
+        connection.setRequestMethod("DELETE");
         connection.setDoOutput(true);
 
         // Set HTTP request headers

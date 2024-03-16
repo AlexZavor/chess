@@ -21,6 +21,7 @@ public class GameUI {
     }
 
     public void run(){
+        out.println(SET_TEXT_COLOR_BLUE + game.gameName());
         //Draw board from White player
         printWhiteBoard();
         out.println();
