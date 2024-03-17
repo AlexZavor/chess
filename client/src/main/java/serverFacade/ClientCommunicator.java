@@ -21,19 +21,19 @@ public class ClientCommunicator {
     }
 
     public RegisterResponse doRegister(RegisterRequest request) throws IOException {
-        return gson.fromJson(doPush("/user", "", gson.toJson(request)), RegisterResponse.class);
+        return gson.fromJson(doPost("/user", "", gson.toJson(request)), RegisterResponse.class);
     }
 
     public LoginResponse doLogin(LoginRequest request) throws IOException {
-        return gson.fromJson(doPush("/session", "", gson.toJson(request)), LoginResponse.class);
+        return gson.fromJson(doPost("/session", "", gson.toJson(request)), LoginResponse.class);
     }
 
     public LogoutResponse doLogout(LogoutRequest request) throws IOException {
-        return gson.fromJson(doDelete("/session", request.authToken(), gson.toJson(request)), LogoutResponse.class);
+        return gson.fromJson(doDelete(request.authToken()), LogoutResponse.class);
     }
 
     public ListGamesResponse doListGames(ListGamesRequest request) throws IOException {
-        return gson.fromJson(doGet("/game", request.authToken()), ListGamesResponse.class);
+        return gson.fromJson(doGet(request.authToken()), ListGamesResponse.class);
     }
 
     public CreateGameResponse doCreateGame(CreateGameRequest request, String authToken) throws IOException {
@@ -41,19 +41,12 @@ public class ClientCommunicator {
     }
 
     public JoinGameResponse doJoinGame(JoinGameRequest request, String authToken) throws IOException {
-        return gson.fromJson(doPut("/game", authToken, gson.toJson(request)), JoinGameResponse.class);
+        return gson.fromJson(doPut(authToken, gson.toJson(request)), JoinGameResponse.class);
     }
 
-    private String doGet(String URLPath, String authToken) throws IOException {
-        URL url = new URL("http://localhost:" + port + URLPath);
-
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-        connection.setReadTimeout(5000);
+    private String doGet(String authToken) throws IOException {
+        HttpURLConnection connection = getConnection("/game", authToken);
         connection.setRequestMethod("GET");
-
-        // Set HTTP request headers
-        connection.addRequestProperty("authorization", authToken);
 
         connection.connect();
 
@@ -62,16 +55,9 @@ public class ClientCommunicator {
     }
 
     private String doPost(String URLPath, String authToken, String body) throws IOException {
-        URL url = new URL("http://localhost:" + port + URLPath);
-
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-        connection.setReadTimeout(5000);
+        HttpURLConnection connection = getConnection(URLPath, authToken);
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
-
-        // Set HTTP request headers
-        connection.addRequestProperty("authorization", authToken);
 
         connection.connect();
 
@@ -83,40 +69,11 @@ public class ClientCommunicator {
         return stringBuilder.toString();
     }
 
-    private String doPush(String URLPath, String authToken, String body) throws IOException {
-        URL url = new URL("http://localhost:" + port + URLPath);
-
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-        connection.setReadTimeout(5000);
-        connection.setRequestMethod("POST");
-        connection.setDoOutput(true);
-
-        // Set HTTP request headers
-        connection.addRequestProperty("authorization", authToken);
-
-        connection.connect();
-
-        try(OutputStream requestBody = connection.getOutputStream()) {
-            // Write request body to OutputStream ...
-            requestBody.write(body.getBytes());
-        }
-        StringBuilder stringBuilder = getResponse(connection);
-        return stringBuilder.toString();
-    }
-
-    private String doPut(String URLPath, String authToken, String body) throws IOException {
-        URL url = new URL("http://localhost:" + port + URLPath);
-
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-        connection.setReadTimeout(5000);
+    private String doPut(String authToken, String body) throws IOException {
+        HttpURLConnection connection = getConnection("/game", authToken);
         connection.setRequestMethod("PUT");
         connection.setDoOutput(true);
 
-        // Set HTTP request headers
-        connection.addRequestProperty("authorization", authToken);
-
         connection.connect();
 
         try(OutputStream requestBody = connection.getOutputStream()) {
@@ -127,26 +84,28 @@ public class ClientCommunicator {
         return stringBuilder.toString();
     }
 
-    private String doDelete(String URLPath, String authToken, String body) throws IOException {
+    private String doDelete(String authToken) throws IOException {
+        HttpURLConnection connection = getConnection("/session", authToken);
+        connection.setRequestMethod("DELETE");
+        connection.setDoOutput(true);
+
+        connection.connect();
+
+        StringBuilder stringBuilder = getResponse(connection);
+        return stringBuilder.toString();
+    }
+
+    private static HttpURLConnection getConnection(String URLPath, String authToken) throws IOException {
         URL url = new URL("http://localhost:" + port + URLPath);
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         connection.setReadTimeout(5000);
-        connection.setRequestMethod("DELETE");
-        connection.setDoOutput(true);
 
         // Set HTTP request headers
         connection.addRequestProperty("authorization", authToken);
 
-        connection.connect();
-
-        try(OutputStream requestBody = connection.getOutputStream()) {
-            // Write request body to OutputStream ...
-            requestBody.write(body.getBytes());
-        }
-        StringBuilder stringBuilder = getResponse(connection);
-        return stringBuilder.toString();
+        return connection;
     }
 
     private static StringBuilder getResponse(HttpURLConnection connection) throws IOException {
