@@ -1,14 +1,15 @@
 package serverFacade;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import request.*;
 import response.*;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class ClientCommunicator {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
