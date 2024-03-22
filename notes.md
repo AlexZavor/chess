@@ -785,3 +785,41 @@ Code examples on slides. very good.
 
 # Logging
 Built in loggers, make a logger, set a priority level.
+
+# Defensive Programming
+Write fewer bugs
+    - Assertions
+        write in assertions for your assumptions ( this value should be in this range ext.)
+        run with configuration java -ea or won't be compiled
+    - Parameter Checking
+        Could do with assertions
+        throw invalid argument exception
+        Decide? do you have control over calling code? assertions
+        don't? probably exceptions.
+
+# Web Socket
+### HTTP review
+Client initiates, server responds
+great for getting information
+    not great for communication across server
+reply only
+    perhaps with pings, or short polling
+        expensive
+    long polling
+        just wait until there is a reply, server only replies when they have data
+    Polling in general
+        just kinda slow, expensive, and application specific
+Web Socket
+    uses HTTP
+    bidirectional!
+    request and then it runs HTTP++
+
+Spark.webSocket("/connect", WebSocket.class);
+
+Examples in pet shop
+
+# Phase 6
+you want to make notifications, update board, joins and observers
+
+Server gets a session, relate to username, check game for what usernames, notify sessions.
+
