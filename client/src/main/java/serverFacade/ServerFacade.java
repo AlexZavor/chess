@@ -8,9 +8,17 @@ import java.util.ArrayList;
 
 public class ServerFacade {
     private static HttpCommunicator communicator;
+    private static WebsocketCommunicator websocketCommunicator;
 
     public ServerFacade(int port){
         communicator = new HttpCommunicator(port);
+    }
+    public ServerFacade(ServerMessageObserver observer){
+        try {
+            websocketCommunicator = new WebsocketCommunicator(observer);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
     public ServerFacade(){}
 
@@ -61,5 +69,9 @@ public class ServerFacade {
             System.out.println("IO Exception - " + e.getMessage());
             return new JoinGameResponse(400,"ERR - IO Exception");
         }
+    }
+
+    public void send(String msg) throws Exception {
+        websocketCommunicator.send(msg);
     }
 }

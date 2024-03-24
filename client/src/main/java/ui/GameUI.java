@@ -4,6 +4,7 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
+import serverFacade.ServerFacade;
 import serverFacade.ServerMessageObserver;
 import webSocketMessages.serverMessages.Error;
 import webSocketMessages.serverMessages.LoadGame;
@@ -16,6 +17,7 @@ import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
 public class GameUI implements ServerMessageObserver {
+    private final ServerFacade server;
     GameData game;
     private final ChessGame.TeamColor playerTeam;
     private final boolean isObserver;
@@ -31,6 +33,7 @@ public class GameUI implements ServerMessageObserver {
         this.username = username;
         this.playerTeam = playerTeam;
         this.isObserver = isObserver;
+        server = new ServerFacade(this);
     }
 
     public void run(){
@@ -55,6 +58,11 @@ public class GameUI implements ServerMessageObserver {
                     break;
                 case 4:
                     out.println(SET_TEXT_COLOR_BLUE + "--Make Move--");
+                    try {
+                        server.send("ping");
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                     break;
                 case 5:
                     out.println(SET_TEXT_COLOR_BLUE + "--Resign--");
@@ -279,15 +287,20 @@ public class GameUI implements ServerMessageObserver {
         this.game = game;
         printBoard(playerTeam);
         printOptions();
+        out.print(SET_TEXT_COLOR_GREEN + "[User: " + username + "] > ");
     }
 
     private void displayError(String errorMessage) {
+        out.println();
         out.println(SET_TEXT_ITALIC + SET_TEXT_COLOR_RED + "Error: " + errorMessage);
         out.print(RESET_TEXT_ITALIC);
+        out.print(SET_TEXT_COLOR_GREEN + "[User: " + username + "] > ");
     }
 
     private void displayNotification(String message) {
+        out.println();
         out.println(SET_TEXT_ITALIC + SET_TEXT_COLOR_BLUE + message);
         out.print(RESET_TEXT_ITALIC);
+        out.print(SET_TEXT_COLOR_GREEN + "[User: " + username + "] > ");
     }
 }
