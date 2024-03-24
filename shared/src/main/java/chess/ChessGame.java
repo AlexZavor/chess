@@ -13,6 +13,8 @@ public class ChessGame {
 
     private TeamColor teamTurn = TeamColor.WHITE;
 
+    private boolean gameOver = false;
+
     private ChessBoard board = new ChessBoard();
 
     public ChessGame() {
@@ -188,5 +190,13 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    public boolean getGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean isGameOver){
+        gameOver = isGameOver;
     }
 }

@@ -7,7 +7,7 @@ public class LoadGame extends ServerMessage{
     final GameData game;
 
     public LoadGame(GameData game) {
-        super(ServerMessage.ServerMessageType.NOTIFICATION);
+        super(ServerMessageType.LOAD_GAME);
         this.game = game;
     }
 
