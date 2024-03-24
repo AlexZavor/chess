@@ -4,12 +4,10 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
-import serverFacade.ServerFacade;
-import serverFacade.ServerMessageObserver;
+import request.*;
+import serverFacade.*;
+import webSocketMessages.serverMessages.*;
 import webSocketMessages.serverMessages.Error;
-import webSocketMessages.serverMessages.LoadGame;
-import webSocketMessages.serverMessages.Notification;
-import webSocketMessages.serverMessages.ServerMessage;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -34,13 +32,14 @@ public class GameUI implements ServerMessageObserver {
         this.playerTeam = playerTeam;
         this.isObserver = isObserver;
         server = new ServerFacade(this);
+        server.joinGameWS(new JoinGameRequest(playerTeam.toString(), game.gameID()), authToken, isObserver);
     }
 
     public void run(){
-        printHeader();
-        printBoard(playerTeam);
-
-        printOptions();
+//        printHeader();
+//        printBoard(playerTeam);
+//
+//        printOptions();
         boolean quit = false;
         while(!quit){
             switch (getInput()){
@@ -58,11 +57,6 @@ public class GameUI implements ServerMessageObserver {
                     break;
                 case 4:
                     out.println(SET_TEXT_COLOR_BLUE + "--Make Move--");
-                    try {
-                        server.send("ping");
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
                     break;
                 case 5:
                     out.println(SET_TEXT_COLOR_BLUE + "--Resign--");
@@ -93,12 +87,16 @@ public class GameUI implements ServerMessageObserver {
         out.println("    1 > Help");
         out.println("    2 > Redraw Board");
         out.println("    3 > Leave");
-        if(game.game().getTeamTurn() != playerTeam){
+        if((game.game().getTeamTurn() != playerTeam) || isObserver){
             out.print(SET_TEXT_COLOR_LIGHT_GREY);
         }
         out.println("    4 > Make Move");
         out.print(SET_TEXT_COLOR_BLUE);
+        if((game.game().getGameOver()) || isObserver){
+            out.print(SET_TEXT_COLOR_LIGHT_GREY);
+        }
         out.println("    5 > Resign");
+        out.print(SET_TEXT_COLOR_BLUE);
         out.println("    6 > Highlight Legal Moves");
     }
 
@@ -272,6 +270,7 @@ public class GameUI implements ServerMessageObserver {
         out.print(SET_TEXT_COLOR_BLUE);
     }
 
+
     // Web Socket functions
 
     @Override
@@ -285,6 +284,7 @@ public class GameUI implements ServerMessageObserver {
 
     private void loadGame(GameData game) {
         this.game = game;
+        printHeader();
         printBoard(playerTeam);
         printOptions();
         out.print(SET_TEXT_COLOR_GREEN + "[User: " + username + "] > ");

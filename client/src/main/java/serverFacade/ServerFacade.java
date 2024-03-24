@@ -70,8 +70,15 @@ public class ServerFacade {
             return new JoinGameResponse(400,"ERR - IO Exception");
         }
     }
-
-    public void send(String msg) throws Exception {
-        websocketCommunicator.send(msg);
+    public void joinGameWS(JoinGameRequest request, String authToken, boolean isObserver){
+        try {
+            if(isObserver){
+                websocketCommunicator.doJoinObserver(request, authToken);
+            }else{
+                websocketCommunicator.doJoinPlayer(request, authToken);
+            }
+        } catch (IOException e) {
+            System.out.println("IO Exception - " + e.getMessage());
+        }
     }
 }
