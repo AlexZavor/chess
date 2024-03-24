@@ -7,10 +7,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class ServerFacade {
-    private static ClientCommunicator communicator;
+    private static HttpCommunicator communicator;
 
     public ServerFacade(int port){
-        communicator = new ClientCommunicator(port);
+        communicator = new HttpCommunicator(port);
     }
     public ServerFacade(){}
 

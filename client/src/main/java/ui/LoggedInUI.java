@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import model.GameData;
 import request.*;
 import response.*;
@@ -145,7 +146,10 @@ public class LoggedInUI {
             if((player.equalsIgnoreCase("white") && game.whiteUsername() == null) ||
                 (player.equalsIgnoreCase("black") && game.blackUsername() == null)){
                 server.joinGame(new JoinGameRequest(player.toUpperCase(), game.gameID()), authToken);
-                startGame(game);
+                ChessGame.TeamColor playerColor = player.equalsIgnoreCase("white") ?
+                                                        ChessGame.TeamColor.WHITE :
+                                                        ChessGame.TeamColor.BLACK;
+                startGame(game, playerColor, false);
                 break;
             } else {
                 out.println(SET_TEXT_COLOR_RED + "Please enter valid selection " + options);
@@ -157,7 +161,7 @@ public class LoggedInUI {
     private void joinObserver(){
         var game = getGame();
         server.joinGame(new JoinGameRequest("", game.gameID()), authToken);
-        startGame(game);
+        startGame(game, ChessGame.TeamColor.WHITE, true);
     }
 
     private int getInput(){
@@ -201,8 +205,8 @@ public class LoggedInUI {
         return games.get(gameIndex);
     }
 
-    private void startGame(GameData game){
-        GameUI gameUI = new GameUI(game);
+    private void startGame(GameData game, ChessGame.TeamColor playerColor, boolean isObserver){
+        GameUI gameUI = new GameUI(game, authToken, username, playerColor, isObserver);
         gameUI.run();
         printHeader();
         printOptions();

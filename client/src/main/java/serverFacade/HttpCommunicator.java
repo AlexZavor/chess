@@ -11,13 +11,13 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class ClientCommunicator {
+public class HttpCommunicator {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private static int port;
 
-    ClientCommunicator(int port){
-        ClientCommunicator.port = port;
+    HttpCommunicator(int port){
+        HttpCommunicator.port = port;
     }
 
     public RegisterResponse doRegister(RegisterRequest request) throws IOException {

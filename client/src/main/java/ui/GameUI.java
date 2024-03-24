@@ -4,30 +4,137 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
+import request.LogoutRequest;
+import serverFacade.ServerMessageObserver;
+import webSocketMessages.serverMessages.Error;
+import webSocketMessages.serverMessages.LoadGame;
+import webSocketMessages.serverMessages.Notification;
+import webSocketMessages.serverMessages.ServerMessage;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
-public class GameUI {
+public class GameUI implements ServerMessageObserver {
     GameData game;
+    private final ChessGame.TeamColor playerTeam;
+    private final boolean isObserver;
+    private final String authToken;
+    private final String username;
     static int BOARD_SIZE = 8;
     private final PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
     private final Scanner scanner = new Scanner(System.in);
 
-    GameUI(GameData game){
+    GameUI(GameData game, String authToken, String username, ChessGame.TeamColor playerTeam, boolean isObserver){
         this.game = game;
+        this.authToken = authToken;
+        this.username = username;
+        this.playerTeam = playerTeam;
+        this.isObserver = isObserver;
     }
 
     public void run(){
-        out.println(SET_TEXT_COLOR_BLUE + game.gameName());
-        //Draw board from White player
-        printWhiteBoard();
-        out.println();
-        //Draw board from Black player
-        printBlackBoard();
+        printHeader();
+        printBoard(playerTeam);
+
+        printOptions();
+        boolean quit = false;
+        while(!quit){
+            switch (getInput()){
+                case 1:
+                    printHelp();
+                    break;
+                case 2:
+                    out.println(SET_TEXT_COLOR_BLUE + "--Redraw Chess Board--");
+                    printBoard(playerTeam);
+                    printOptions();
+                    break;
+                case 3:
+                    out.println(SET_TEXT_COLOR_BLUE + "Exiting game");
+                    quit = true;
+                    break;
+                case 4:
+                    out.println(SET_TEXT_COLOR_BLUE + "--Make Move--");
+                    break;
+                case 5:
+                    out.println(SET_TEXT_COLOR_BLUE + "--Resign--");
+                    break;
+                case 6:
+                    out.println(SET_TEXT_COLOR_BLUE + "--Highlight Legal Moves--");
+                    break;
+                default:
+                    out.println(SET_TEXT_COLOR_RED + "Please Select from the options");
+                    printOptions();
+                    break;
+            }
+        }
+
     }
+
+
+    // Menu draw methods
+
+    private void printHeader(){
+        out.print(ERASE_SCREEN);
+        out.println(SET_TEXT_COLOR_BLUE + "-- " + game.gameName() + " --");
+        out.println();
+    }
+
+    private void printOptions(){
+        out.print(SET_TEXT_COLOR_BLUE);
+        out.println("    1 > Help");
+        out.println("    2 > Redraw Board");
+        out.println("    3 > Leave");
+        if(game.game().getTeamTurn() != playerTeam){
+            out.print(SET_TEXT_COLOR_LIGHT_GREY);
+        }
+        out.println("    4 > Make Move");
+        out.print(SET_TEXT_COLOR_BLUE);
+        out.println("    5 > Resign");
+        out.println("    6 > Highlight Legal Moves");
+    }
+
+    private void printHelp(){
+        out.print(SET_TEXT_COLOR_BLUE);
+        out.println("Type the number of the option you would like.");
+        out.println("    1 > Help - See this menu");
+        out.println("    2 > Redraw Board - Redraw the game board on screen");
+        out.println("    3 > Leave - Exit the game without resigning");
+        out.println("    4 > Make Move - Make your move in the game");
+        out.println("    5 > Resign - Resign from the game, ending the game and the opponent wins");
+        out.println("    6 > Highlight Legal Moves - Highlights squares that a piece can move to");
+    }
+
+
+    private int getInput(){
+        while (true){
+            out.print(SET_TEXT_COLOR_GREEN + "[User: " + username + "] > ");
+//        out.print(scanner.nextLine());
+            int value;
+            try{
+                value = Integer.parseInt(scanner.nextLine());
+                return value;
+            }catch (NumberFormatException e){
+                out.println(SET_TEXT_COLOR_RED + "Please enter the number representing your choice.");
+            }
+        }
+    }
+
+    private String getString(String request){
+        while(true){
+            out.print(SET_TEXT_COLOR_GREEN + request + " > ");
+            String data = scanner.nextLine();
+            if(data.isEmpty()){
+                out.println(SET_TEXT_COLOR_RED + "Please type a valid " + request);
+            }else{
+                return data;
+            }
+        }
+    }
+
+
+    // White draw methods
 
     private void printWhiteBoard(){
         printWhiteHeader();
@@ -70,6 +177,8 @@ public class GameUI {
     }
 
 
+    // Black draw methods
+
     private void printBlackBoard(){
         printBlackHeader();
         for (int row = 0; row < BOARD_SIZE; row++) {
@@ -110,6 +219,16 @@ public class GameUI {
         out.println();
     }
 
+
+    // Draw help
+
+    private void printBoard(ChessGame.TeamColor color){
+        switch (color){
+            case BLACK -> printBlackBoard();
+            case WHITE -> printWhiteBoard();
+        }
+    }
+
     private void printPiece(ChessPiece piece){
         if(piece == null){
             out.print("   ");
@@ -144,5 +263,32 @@ public class GameUI {
     }
     private void setPieceBlack(){
         out.print(SET_TEXT_COLOR_BLUE);
+    }
+
+    // Web Socket functions
+
+    @Override
+    public void notify(ServerMessage message) {
+        switch (message.getServerMessageType()) {
+            case NOTIFICATION -> displayNotification(((Notification) message).getMessage());
+            case ERROR -> displayError(((Error) message).getErrorMessage());
+            case LOAD_GAME -> loadGame(((LoadGame) message).getGame());
+        }
+    }
+
+    private void loadGame(GameData game) {
+        this.game = game;
+        printBoard(playerTeam);
+        printOptions();
+    }
+
+    private void displayError(String errorMessage) {
+        out.println(SET_TEXT_ITALIC + SET_TEXT_COLOR_RED + "Error: " + errorMessage);
+        out.print(RESET_TEXT_ITALIC);
+    }
+
+    private void displayNotification(String message) {
+        out.println(SET_TEXT_ITALIC + SET_TEXT_COLOR_BLUE + message);
+        out.print(RESET_TEXT_ITALIC);
     }
 }

@@ -1,5 +1,6 @@
 package server;
 
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import spark.*;
 import handler.*;
 
@@ -10,6 +11,7 @@ public class Server {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+        Spark.webSocket("/connect", WSServer.class);
 
         // Register your endpoints and handle exceptions here.
         createRouts();
