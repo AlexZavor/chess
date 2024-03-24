@@ -8,13 +8,9 @@ import request.*;
 import serverFacade.*;
 import webSocketMessages.serverMessages.*;
 import webSocketMessages.serverMessages.Error;
-
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
-public class GameUI implements ServerMessageObserver {
+public class GameUI  extends UI implements ServerMessageObserver {
     private final ServerFacade server;
     GameData game;
     private final ChessGame.TeamColor playerTeam;
@@ -22,8 +18,6 @@ public class GameUI implements ServerMessageObserver {
     private final String authToken;
     private final String username;
     static int BOARD_SIZE = 8;
-    private final PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-    private final Scanner scanner = new Scanner(System.in);
 
     GameUI(GameData game, String authToken, String username, ChessGame.TeamColor playerTeam, boolean isObserver){
         this.game = game;
@@ -36,18 +30,13 @@ public class GameUI implements ServerMessageObserver {
     }
 
     public void run(){
-//        printHeader();
-//        printBoard(playerTeam);
-//
-//        printOptions();
         boolean quit = false;
         while(!quit){
-            switch (getInput()){
+            switch (getInput(username)){
                 case 1:
                     printHelp();
                     break;
                 case 2:
-                    out.println(SET_TEXT_COLOR_BLUE + "--Redraw Chess Board--");
                     printBoard(playerTeam);
                     printOptions();
                     break;
@@ -109,33 +98,6 @@ public class GameUI implements ServerMessageObserver {
         out.println("    4 > Make Move - Make your move in the game");
         out.println("    5 > Resign - Resign from the game, ending the game and the opponent wins");
         out.println("    6 > Highlight Legal Moves - Highlights squares that a piece can move to");
-    }
-
-
-    private int getInput(){
-        while (true){
-            out.print(SET_TEXT_COLOR_GREEN + "[User: " + username + "] > ");
-//        out.print(scanner.nextLine());
-            int value;
-            try{
-                value = Integer.parseInt(scanner.nextLine());
-                return value;
-            }catch (NumberFormatException e){
-                out.println(SET_TEXT_COLOR_RED + "Please enter the number representing your choice.");
-            }
-        }
-    }
-
-    private String getString(String request){
-        while(true){
-            out.print(SET_TEXT_COLOR_GREEN + request + " > ");
-            String data = scanner.nextLine();
-            if(data.isEmpty()){
-                out.println(SET_TEXT_COLOR_RED + "Please type a valid " + request);
-            }else{
-                return data;
-            }
-        }
     }
 
 
@@ -228,6 +190,7 @@ public class GameUI implements ServerMessageObserver {
     // Draw help
 
     private void printBoard(ChessGame.TeamColor color){
+        printHeader();
         switch (color){
             case BLACK -> printBlackBoard();
             case WHITE -> printWhiteBoard();
@@ -254,22 +217,6 @@ public class GameUI implements ServerMessageObserver {
         }
     }
 
-    private void setHeader(){
-        out.print(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_WHITE);
-    }
-    private void setWhite(){
-        out.print(SET_BG_COLOR_WHITE);
-    }
-    private void setBlack(){
-        out.print(SET_BG_COLOR_BLACK);
-    }
-    private void setPieceWhite(){
-        out.print(SET_TEXT_COLOR_RED);
-    }
-    private void setPieceBlack(){
-        out.print(SET_TEXT_COLOR_BLUE);
-    }
-
 
     // Web Socket functions
 
@@ -284,7 +231,6 @@ public class GameUI implements ServerMessageObserver {
 
     private void loadGame(GameData game) {
         this.game = game;
-        printHeader();
         printBoard(playerTeam);
         printOptions();
         out.print(SET_TEXT_COLOR_GREEN + "[User: " + username + "] > ");

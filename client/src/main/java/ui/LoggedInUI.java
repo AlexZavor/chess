@@ -5,22 +5,16 @@ import model.GameData;
 import request.*;
 import response.*;
 import serverFacade.ServerFacade;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
-public class LoggedInUI {
+public class LoggedInUI extends UI{
 
     private final String username;
     private final String authToken;
     private final ArrayList<GameData> games = new ArrayList<>();
-
-    private final PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-    private final Scanner scanner = new Scanner(System.in);
     private static final ServerFacade server = new ServerFacade();
 
     LoggedInUI(String username, String authToken){
@@ -33,7 +27,7 @@ public class LoggedInUI {
         printOptions();
         boolean quit = false;
         while(!quit){
-            switch (getInput()){
+            switch (getInput(username)){
                 case 1:
                     printHelp();
                     break;
@@ -164,38 +158,12 @@ public class LoggedInUI {
         startGame(game, ChessGame.TeamColor.WHITE, true);
     }
 
-    private int getInput(){
-        while (true){
-            out.print(SET_TEXT_COLOR_GREEN + "[User: " + username + "] > ");
-//        out.print(scanner.nextLine());
-            int value;
-            try{
-                value = Integer.parseInt(scanner.nextLine());
-                return value;
-            }catch (NumberFormatException e){
-                out.println(SET_TEXT_COLOR_RED + "Please enter the number representing your choice.");
-            }
-        }
-    }
-
-    private String getString(String request){
-        while(true){
-            out.print(SET_TEXT_COLOR_GREEN + request + " > ");
-            String data = scanner.nextLine();
-            if(data.isEmpty()){
-                out.println(SET_TEXT_COLOR_RED + "Please type a valid " + request);
-            }else{
-                return data;
-            }
-        }
-    }
-
     private GameData getGame(){
         listGames();
         out.println(SET_TEXT_COLOR_BLUE + "Enter number of Game to join");
         int gameIndex;
         while(true){
-            gameIndex = getInput();
+            gameIndex = getInput(username);
             if(gameIndex < games.size()){
                 break;
             } else {

@@ -3,15 +3,10 @@ package ui;
 import request.*;
 import response.*;
 import serverFacade.ServerFacade;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
-public class PreLoginUI {
+public class PreLoginUI extends UI{
 
-    private final PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-    private final Scanner scanner = new Scanner(System.in);
     private ServerFacade server;
 
     public void run(int port){
@@ -97,32 +92,6 @@ public class PreLoginUI {
             out.println(SET_TEXT_COLOR_RED + "Username Already Taken");
         }else{
             out.println(SET_TEXT_COLOR_RED + "Failed to Register user");
-        }
-    }
-
-    private int getInput(){
-        while (true){
-            out.print(SET_TEXT_COLOR_GREEN + ">> ");
-//        out.print(scanner.nextLine());
-            int value;
-            try{
-                value = Integer.parseInt(scanner.nextLine());
-                return value;
-            }catch (NumberFormatException e){
-                out.println(SET_TEXT_COLOR_RED + "Please enter the number representing your choice.");
-            }
-        }
-    }
-
-    private String getString(String request){
-        while(true){
-            out.print(SET_TEXT_COLOR_GREEN + request + " > ");
-            String data = scanner.nextLine();
-            if(data.isEmpty()){
-                out.println(SET_TEXT_COLOR_RED + "Please type a valid " + request);
-            }else{
-                return data;
-            }
         }
     }
 
