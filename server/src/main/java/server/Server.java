@@ -1,6 +1,5 @@
 package server;
 
-import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import spark.*;
 import handler.*;
 
