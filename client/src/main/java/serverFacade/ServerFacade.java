@@ -1,5 +1,6 @@
 package serverFacade;
 
+import chess.ChessMove;
 import request.*;
 import response.*;
 
@@ -77,6 +78,30 @@ public class ServerFacade {
             }else{
                 websocketCommunicator.doJoinPlayer(request, authToken);
             }
+        } catch (IOException e) {
+            System.out.println("IO Exception - " + e.getMessage());
+        }
+    }
+
+    public void leaveGame(String authToken, int gameID) {
+        try {
+            websocketCommunicator.doLeave(authToken, gameID);
+        } catch (IOException e) {
+            System.out.println("IO Exception - " + e.getMessage());
+        }
+    }
+
+    public void makeMove(String authToken, int gameID, ChessMove move) {
+        try {
+            websocketCommunicator.doMakeMove(authToken, gameID, move);
+        } catch (IOException e) {
+            System.out.println("IO Exception - " + e.getMessage());
+        }
+    }
+
+    public void resign(String authToken, int gameID) {
+        try {
+            websocketCommunicator.doResign(authToken, gameID);
         } catch (IOException e) {
             System.out.println("IO Exception - " + e.getMessage());
         }

@@ -1,6 +1,7 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
@@ -42,16 +43,20 @@ public class GameUI  extends UI implements ServerMessageObserver {
                     break;
                 case 3:
                     out.println(SET_TEXT_COLOR_BLUE + "Exiting game");
+                    leave();
                     quit = true;
                     break;
                 case 4:
                     out.println(SET_TEXT_COLOR_BLUE + "--Make Move--");
+                    makeMove();
                     break;
                 case 5:
                     out.println(SET_TEXT_COLOR_BLUE + "--Resign--");
+                    resign();
                     break;
                 case 6:
                     out.println(SET_TEXT_COLOR_BLUE + "--Highlight Legal Moves--");
+                    highlightMoves();
                     break;
                 default:
                     out.println(SET_TEXT_COLOR_RED + "Please Select from the options");
@@ -60,6 +65,98 @@ public class GameUI  extends UI implements ServerMessageObserver {
             }
         }
 
+    }
+
+    private void leave() {
+        server.leaveGame(authToken, game.gameID());
+    }
+
+    private void makeMove() {
+        // First checks
+        if(isObserver){
+            out.println(SET_TEXT_COLOR_RED + "You can't move pieces as an observer.");
+            return;
+        }
+        if((game.game().getTeamTurn() != playerTeam)){
+            out.println(SET_TEXT_COLOR_RED + "It's not your turn.");
+            return;
+        }
+
+        // Start position
+        out.println(SET_TEXT_COLOR_BLUE + "Enter column as letter, enter row as number.");
+        var column = getString("What piece? - column");
+        int columnInt;
+        var row = getString("What piece? - row");
+        int rowInt;
+        try{
+            columnInt = charToInt(column);
+            rowInt = Integer.parseInt(row);
+            if(rowInt > 8){throw new NumberFormatException("Out of range");}
+        } catch (NumberFormatException e) {
+            out.println(SET_TEXT_COLOR_RED + "please enter as number or letter.");
+            return;
+        }
+        var startPos = new ChessPosition(rowInt,columnInt);
+
+        // Check piece
+        var piece = game.game().getBoard().getPiece(startPos);
+        if(piece == null){
+            out.println(SET_TEXT_COLOR_RED + "There is no piece there.");
+            return;
+        }
+        if(piece.getTeamColor() != playerTeam){
+            out.println(SET_TEXT_COLOR_RED + "That is not your piece!");
+            return;
+        }
+
+        // Get destination
+        var destColumn = getString("Where to? - column");
+        int destColumnInt;
+        var destRow = getString("Where to? - row");
+        int destRowInt;
+        try{
+            destColumnInt = charToInt(destColumn);
+            destRowInt = Integer.parseInt(destRow);
+        } catch (NumberFormatException e) {
+            out.println(SET_TEXT_COLOR_RED + "please enter as number or letter.");
+            return;
+        }
+        var destPos = new ChessPosition(destRowInt,destColumnInt);
+        var move = new ChessMove(startPos,destPos,null);
+        var validMoves = game.game().validMoves(startPos);
+        if(!validMoves.contains(move)){
+            out.println(SET_TEXT_COLOR_RED + "Not a valid move");
+            return;
+        }
+
+        server.makeMove(authToken, game.gameID(), move);
+    }
+
+    private void resign() {
+        if(!isObserver){
+            server.resign(authToken, game.gameID());
+        } else {
+            out.println(SET_TEXT_COLOR_RED + "You can't resign as an observer!");
+        }
+    }
+
+    private void highlightMoves() {
+        printBoard(playerTeam);
+        // TODO: set up how to highlight moves with drawing board
+    }
+
+    private int charToInt(String in) throws NumberFormatException{
+        return switch (in.toLowerCase()) {
+            case "a" -> 1;
+            case "b" -> 2;
+            case "c" -> 3;
+            case "d" -> 4;
+            case "e" -> 5;
+            case "f" -> 6;
+            case "g" -> 7;
+            case "h" -> 8;
+            default -> throw new NumberFormatException("Out of range");
+        };
     }
 
 

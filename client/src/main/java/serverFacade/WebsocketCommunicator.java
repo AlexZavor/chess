@@ -1,28 +1,26 @@
 package serverFacade;
+
 import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import request.JoinGameRequest;
-import response.JoinGameResponse;
-import webSocketMessages.serverMessages.*;
 import webSocketMessages.serverMessages.Error;
-import webSocketMessages.userCommands.JoinObserver;
-import webSocketMessages.userCommands.JoinPlayer;
-import webSocketMessages.userCommands.UserGameCommand;
+import webSocketMessages.serverMessages.Notification;
+import webSocketMessages.serverMessages.ServerMessage;
+import webSocketMessages.userCommands.*;
 
+import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
-import javax.websocket.*;
 
 public class WebsocketCommunicator extends Endpoint {
 
     private final Session session;
 
-    private final ServerMessageObserver observer;
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public WebsocketCommunicator(ServerMessageObserver observer) throws Exception {
-        this.observer = observer;
         URI uri = new URI("ws://localhost:8080/connect");
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, uri);
@@ -53,6 +51,21 @@ public class WebsocketCommunicator extends Endpoint {
                                                     ChessGame.TeamColor.WHITE:
                                                     ChessGame.TeamColor.BLACK
                                             );
+        this.session.getBasicRemote().sendText(gson.toJson(command));
+    }
+
+    public void doLeave(String authToken, int gameID) throws IOException {
+        Leave command = new Leave(authToken, gameID);
+        this.session.getBasicRemote().sendText(gson.toJson(command));
+    }
+
+    public void doMakeMove(String authToken, int gameID, ChessMove move) throws IOException {
+        MakeMove command = new MakeMove(authToken, gameID, move);
+        this.session.getBasicRemote().sendText(gson.toJson(command));
+    }
+
+    public void doResign(String authToken, int gameID) throws IOException {
+        Resign command = new Resign(authToken, gameID);
         this.session.getBasicRemote().sendText(gson.toJson(command));
     }
 }
