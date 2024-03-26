@@ -8,6 +8,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
 import service.UserService;
+import webSocketMessages.serverMessages.Error;
 import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.userCommands.*;
@@ -38,12 +39,35 @@ public class WSServer {
 
     private void join(Session session, JoinPlayer command) throws IOException {
         System.out.println("Join request");
+
+        // Checking
+        var game = gameService.getGame(command.gameID);
+        if(game == null){
+            session.getRemote().sendString(gson.toJson(new Error("Error: Bad Game ID")));
+            return;
+        }
+        var username = userService.getUsername(command.getAuthString());
+        if(username == null){
+            session.getRemote().sendString(gson.toJson(new Error("Error: Bad Auth Token")));
+            return;
+        }
+        if(command.playerColor == ChessGame.TeamColor.WHITE){
+            if(!Objects.equals(game.whiteUsername(), username)){
+                session.getRemote().sendString(gson.toJson(new Error("Error: Wrong team color")));
+                return;
+            }
+        }else
+        if(command.playerColor == ChessGame.TeamColor.BLACK){
+            if(!Objects.equals(game.blackUsername(), username)){
+                session.getRemote().sendString(gson.toJson(new Error("Error: Wrong team color")));
+                return;
+            }
+        }
+
         // add new user to game
         userMap.computeIfAbsent(command.gameID, k -> new ArrayList<>());
         userMap.get(command.gameID).add(new WSUser(command.getAuthString(), session));
 
-        var game = gameService.getGame(command.gameID);
-        var username = userService.getUsername(command.getAuthString());
         session.getRemote().sendString(gson.toJson(new LoadGame(game)));
 
         notifyOtherUsers(game.gameID(), command.getAuthString(), "Player " + username + " has joined as " + command.playerColor.toString());
@@ -51,12 +75,23 @@ public class WSServer {
 
     private void observe(Session session, JoinObserver command) throws IOException {
         System.out.println("Observe request");
+
+        // testing
+        var username = userService.getUsername(command.getAuthString());
+        if(username == null){
+            session.getRemote().sendString(gson.toJson(new Error("Error: Bad Auth Token")));
+            return;
+        }
+        var game = gameService.getGame(command.gameID);
+        if(game == null){
+            session.getRemote().sendString(gson.toJson(new Error("Error: Bad Game ID")));
+            return;
+        }
+
         // add new user to game
         userMap.computeIfAbsent(command.gameID, k -> new ArrayList<>());
         userMap.get(command.gameID).add(new WSUser(command.getAuthString(), session));
 
-        var game = gameService.getGame(command.gameID);
-        var username = userService.getUsername(command.getAuthString());
         session.getRemote().sendString(gson.toJson(new LoadGame(game)));
 
         notifyOtherUsers(game.gameID(), command.getAuthString(), username + " has joined as an observer.");

@@ -27,7 +27,7 @@ public class Service {
         }
     }
 
-    protected GameData getGame(int gameID){
+    public GameData getGame(int gameID){
         try {
             return games.getGame(gameID);
         } catch (DataAccessException e) {

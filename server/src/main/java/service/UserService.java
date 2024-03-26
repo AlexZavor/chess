@@ -64,7 +64,7 @@ public class UserService extends Service {
         try {
             return auths.getAuth(authToken).username();
         } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 }
