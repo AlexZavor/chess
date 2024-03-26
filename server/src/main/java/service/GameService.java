@@ -1,6 +1,8 @@
 package service;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import dataAccess.*;
 import model.*;
 import request.*;
@@ -112,4 +114,51 @@ public class GameService extends Service{
         } catch (DataAccessException ignored) {}
     }
 
+    public void endGame(int gameID){
+
+        // Find game to update
+        GameData gameCheck = getGame(gameID);
+        if(gameCheck == null){
+            return;
+        }
+
+        GameData gameToUpdate = new GameData(gameCheck.gameID(),
+                gameCheck.whiteUsername(),
+                gameCheck.blackUsername(),
+                gameCheck.gameName(),
+                gameCheck.game());
+
+        gameToUpdate.game().setGameOver(true);
+
+        // Update game
+        try {
+            games.updateGame(gameID, gameToUpdate);
+        } catch (DataAccessException ignored) {}
+    }
+
+    public void makeMove(Integer gameID, ChessMove move) throws InvalidMoveException {
+        // Find game to update
+        GameData gameCheck = getGame(gameID);
+        if(gameCheck == null){
+            return;
+        }
+
+        GameData gameToUpdate = new GameData(gameCheck.gameID(),
+                gameCheck.whiteUsername(),
+                gameCheck.blackUsername(),
+                gameCheck.gameName(),
+                gameCheck.game());
+
+        gameToUpdate.game().makeMove(move);
+
+        if(gameToUpdate.game().isInCheckmate(ChessGame.TeamColor.WHITE) ||
+                gameToUpdate.game().isInCheckmate(ChessGame.TeamColor.BLACK)){
+            gameToUpdate.game().setGameOver(true);
+        }
+
+        // Update game
+        try {
+            games.updateGame(gameID, gameToUpdate);
+        } catch (DataAccessException ignored) {}
+    }
 }

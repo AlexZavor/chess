@@ -1,6 +1,7 @@
 package server;
 
 import chess.ChessGame;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.eclipse.jetty.websocket.api.Session;
@@ -97,8 +98,61 @@ public class WSServer {
         notifyOtherUsers(game.gameID(), command.getAuthString(), username + " has joined as an observer.");
     }
 
-    private void move(Session session, MakeMove command) {
+    private void move(Session session, MakeMove command) throws IOException {
         System.out.println("Move request");
+
+        var username = userService.getUsername(command.getAuthString());
+        var game = gameService.getGame(command.gameID);
+        ChessGame.TeamColor teamColor;
+        if(game.game().getGameOver()){
+            session.getRemote().sendString(gson.toJson(new Error("Error: Can't move game has ended.")));
+            return;
+        }
+        if(Objects.equals(game.blackUsername(), username)){
+            teamColor = ChessGame.TeamColor.BLACK;
+        }else
+        if(Objects.equals(game.whiteUsername(), username)){
+            teamColor = ChessGame.TeamColor.WHITE;
+        }else {
+            session.getRemote().sendString(gson.toJson(new Error("Error: Observer can't move.")));
+            return;
+        }
+
+        // First checks
+        if((game.game().getTeamTurn() != teamColor)){
+            session.getRemote().sendString(gson.toJson(new Error("Error: not your turn.")));
+            return;
+        }
+
+        // Check piece
+        var piece = game.game().getBoard().getPiece(command.move.getStartPosition());
+        if(piece == null){
+            session.getRemote().sendString(gson.toJson(new Error("Error: No piece there.")));
+            return;
+        }
+        if(piece.getTeamColor() != teamColor){
+            session.getRemote().sendString(gson.toJson(new Error("Error: not your piece.")));
+            return;
+        }
+
+        try {
+            gameService.makeMove(command.gameID, command.move);
+        } catch (InvalidMoveException e) {
+            session.getRemote().sendString(gson.toJson(new Error("Error: Invalid move.")));
+            return;
+        }
+
+        // update all players games
+        game = gameService.getGame(command.gameID);
+        for(var user : userMap.get(command.gameID)){
+            user.session().getRemote().sendString(gson.toJson(
+                    new LoadGame(game)
+            ));
+        }
+
+        // Notify other players
+        notifyOtherUsers(game.gameID(), command.getAuthString(), username + " played " + command.move);
+
     }
 
     private void leave(Session session, Leave command) throws IOException {
@@ -117,8 +171,28 @@ public class WSServer {
         notifyOtherUsers(game.gameID(), command.getAuthString(), user + " has left the game.");
     }
 
-    private void resign(Session session, Resign command) {
+    private void resign(Session session, Resign command) throws IOException {
         System.out.println("Resign request");
+        var username = userService.getUsername(command.getAuthString());
+        var game = gameService.getGame(command.gameID);
+        ChessGame.TeamColor teamWin;
+        if(game.game().getGameOver()){
+            session.getRemote().sendString(gson.toJson(new Error("Error: Game Already over.")));
+            return;
+        }
+        if(Objects.equals(game.blackUsername(), username)){
+            teamWin = ChessGame.TeamColor.WHITE;
+        }else
+        if(Objects.equals(game.whiteUsername(), username)){
+            teamWin = ChessGame.TeamColor.BLACK;
+        }else {
+            session.getRemote().sendString(gson.toJson(new Error("Error: Cannot resign.")));
+            return;
+        }
+        gameService.endGame(command.gameID);
+        notifyAllUsers(command.gameID,
+                username + "Has resigned from the game! " + teamWin + " Wins!"
+        );
     }
 
 
@@ -133,13 +207,20 @@ public class WSServer {
     }
 
     private void notifyOtherUsers(int gameID, String authToken, String message) throws IOException {
-
         for(var user : userMap.get(gameID)){
             if(!user.authToken().equals(authToken)){
                 user.session().getRemote().sendString(gson.toJson(
                         new Notification(message)
                 ));
             }
+        }
+    }
+
+    private void notifyAllUsers(int gameID, String message) throws IOException {
+        for(var user : userMap.get(gameID)){
+            user.session().getRemote().sendString(gson.toJson(
+                    new Notification(message)
+            ));
         }
     }
 
