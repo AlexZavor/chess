@@ -1,15 +1,28 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import service.GameService;
+import service.UserService;
+import webSocketMessages.serverMessages.LoadGame;
+import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.userCommands.*;
+
+import java.io.IOException;
+import java.util.*;
 
 @WebSocket
 public class WSServer {
-//    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    GameService gameService = new GameService();
+    UserService userService = new UserService();
+
+    private final Map<Integer, List<WSUser>> userMap = new HashMap<>();
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
@@ -23,20 +36,50 @@ public class WSServer {
         }
     }
 
-    private void join(Session session, JoinPlayer command) {
+    private void join(Session session, JoinPlayer command) throws IOException {
         System.out.println("Join request");
+        // add new user to game
+        userMap.computeIfAbsent(command.gameID, k -> new ArrayList<>());
+        userMap.get(command.gameID).add(new WSUser(command.getAuthString(), session));
+
+        var game = gameService.getGame(command.gameID);
+        var username = userService.getUsername(command.getAuthString());
+        session.getRemote().sendString(gson.toJson(new LoadGame(game)));
+
+        notifyOtherUsers(game.gameID(), command.getAuthString(), "Player " + username + " has joined as " + command.playerColor.toString());
     }
 
-    private void observe(Session session, JoinObserver command) {
+    private void observe(Session session, JoinObserver command) throws IOException {
         System.out.println("Observe request");
+        // add new user to game
+        userMap.computeIfAbsent(command.gameID, k -> new ArrayList<>());
+        userMap.get(command.gameID).add(new WSUser(command.getAuthString(), session));
+
+        var game = gameService.getGame(command.gameID);
+        var username = userService.getUsername(command.getAuthString());
+        session.getRemote().sendString(gson.toJson(new LoadGame(game)));
+
+        notifyOtherUsers(game.gameID(), command.getAuthString(), username + " has joined as an observer.");
     }
 
     private void move(Session session, MakeMove command) {
         System.out.println("Move request");
     }
 
-    private void leave(Session session, Leave command) {
+    private void leave(Session session, Leave command) throws IOException {
         System.out.println("Leave request");
+        userMap.get(command.gameID).remove(new WSUser(command.getAuthString(), session));
+
+        var game = gameService.getGame(command.gameID);
+        var user = userService.getUsername(command.getAuthString());
+
+        if(Objects.equals(game.blackUsername(), user)){
+            gameService.removePlayer(command.gameID, ChessGame.TeamColor.BLACK);
+        }else if (Objects.equals(game.whiteUsername(), user)){
+            gameService.removePlayer(command.gameID, ChessGame.TeamColor.WHITE);
+        }
+
+        notifyOtherUsers(game.gameID(), command.getAuthString(), user + " has left the game.");
     }
 
     private void resign(Session session, Resign command) {
@@ -48,10 +91,21 @@ public class WSServer {
         // Register a deserializer for the User game Command interface
         GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapter(UserGameCommand.class, new CommandDeserializer());
-        Gson gson = builder.create();
+        Gson gsonCommand = builder.create();
 
         // Parse the json string
-        return gson.fromJson(message, UserGameCommand.class);
+        return gsonCommand.fromJson(message, UserGameCommand.class);
+    }
+
+    private void notifyOtherUsers(int gameID, String authToken, String message) throws IOException {
+
+        for(var user : userMap.get(gameID)){
+            if(!user.authToken().equals(authToken)){
+                user.session().getRemote().sendString(gson.toJson(
+                        new Notification(message)
+                ));
+            }
+        }
     }
 
 }

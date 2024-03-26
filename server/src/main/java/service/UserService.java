@@ -59,4 +59,12 @@ public class UserService extends Service {
 
         return new LogoutResponse(200, null);
     }
+
+    public String getUsername(String authToken){
+        try {
+            return auths.getAuth(authToken).username();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

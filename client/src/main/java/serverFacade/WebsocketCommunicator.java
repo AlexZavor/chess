@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import request.JoinGameRequest;
 import webSocketMessages.serverMessages.Error;
-import webSocketMessages.serverMessages.Notification;
+import webSocketMessages.serverMessages.MessageDeserializer;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.*;
 
@@ -28,8 +28,7 @@ public class WebsocketCommunicator extends Endpoint {
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
             public void onMessage(String message) {
                 try {
-                    ServerMessage serverMessage =
-                            gson.fromJson(message, Notification.class);
+                    ServerMessage serverMessage = readJson(message);
                     observer.notify(serverMessage);
                 } catch(Exception ex) {
                     observer.notify(new Error(ex.getMessage()));
@@ -39,6 +38,17 @@ public class WebsocketCommunicator extends Endpoint {
     }
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
+
+    private ServerMessage readJson(String message) {
+        // Register a deserializer for the User game Command interface
+        GsonBuilder builder = new GsonBuilder();
+        builder.registerTypeAdapter(ServerMessage.class, new MessageDeserializer());
+        Gson gsonMessage = builder.create();
+
+        // Parse the json string
+        return gsonMessage.fromJson(message, ServerMessage.class);
+    }
+
 
     public void doJoinObserver(JoinGameRequest request, String authToken) throws IOException {
         JoinObserver command = new JoinObserver(authToken, request.gameID());

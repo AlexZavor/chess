@@ -92,4 +92,32 @@ public class GameService extends Service{
         return new JoinGameResponse(200, null);
     }
 
+    public GameData getGame(int gameID){
+        try {
+            return games.getGame(gameID);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void removePlayer(int gameID, ChessGame.TeamColor teamColor){
+
+        // Find game to update
+        GameData gameCheck = getGame(gameID);
+        if(gameCheck == null){
+            return;
+        }
+
+        GameData gameToUpdate = new GameData(gameCheck.gameID(),
+                teamColor == ChessGame.TeamColor.WHITE ? null : gameCheck.whiteUsername(),
+                teamColor == ChessGame.TeamColor.BLACK ? null : gameCheck.blackUsername(),
+                gameCheck.gameName(),
+                gameCheck.game());
+
+        // Update game
+        try {
+            games.updateGame(gameID, gameToUpdate);
+        } catch (DataAccessException ignored) {}
+    }
+
 }
