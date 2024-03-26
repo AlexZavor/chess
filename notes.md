@@ -823,3 +823,61 @@ you want to make notifications, update board, joins and observers
 
 Server gets a session, relate to username, check game for what usernames, notify sessions.
 
+# Security (Test)
+Data at rest - sitting in a file
+Data in motion - being transferred
+Unauthorized access to computers - launch attacks, malware, virus, monitor
+Disable a system - DDoS
+
+we want:
+    Data confidentiality
+    Authentication
+    Data integrity (data hasn't changed)
+    Non-repudiation
+        can data be trusted?
+
+### Foundation
+Cryptographic hash
+    One way transfer from data to data.
+    Can't be reversed.
+    Deterministic (always gets same response)
+    Fixed size (output same size)
+    Pseudo-random
+        seems random, small change makes complete difference
+    old - MD-5, SHA-1 (cracked)
+    new - SHA-2, SHA-3
+    Can use for strings, and ensuring downloads.
+    Also, storing passwords? should be encrypted
+        but, if they are just sraight through, then you can get data
+            dictonary attack, guess common.
+        help with a little salt, some random added parts.
+        passwords should take time
+Data encryption
+    making the data that only authorized people can read
+    plain text, cypher text, key, key size
+    Symmetric key encryption
+        or Secret key
+        same key for encryption and decryption, both parties have it.
+    Asymmetric key
+        or public key,
+        one key for encryption, another for decryption
+        encrypt with public key, decrypt with private key.
+        only works for small data packets
+        slower
+    what about with both? use asymmetric to send symmetric
+    Key exchange in HTTPS, secure HTTP
+        Client sends sever random numbers
+        server sends public key, client sends back keys, 
+        generates symmetric keys together.
+digital certificates
+    has public keys, information about key owner.
+    how do we know if it is real?
+        created by certificate authority's.
+        Yep, thats it, you pay the company and you get one.
+            you own this company? this website? go change it. go on, change it.
+Digital Signatures
+    How can we certify a file to make sure we know how it changed?
+    take a hash of it, make sure it hasn't changed.
+    make sure the hash wont change by encrypting the hash.
+
+
