@@ -44,23 +44,23 @@ public class WSServer {
         // Checking
         var game = gameService.getGame(command.gameID);
         if(game == null){
-            session.getRemote().sendString(gson.toJson(new Error("Error: Bad Game ID")));
+            sendError(session, "Bad Game ID");
             return;
         }
         var username = userService.getUsername(command.getAuthString());
         if(username == null){
-            session.getRemote().sendString(gson.toJson(new Error("Error: Bad Auth Token")));
+            sendError(session, "Bad Auth Token");
             return;
         }
         if(command.playerColor == ChessGame.TeamColor.WHITE){
             if(!Objects.equals(game.whiteUsername(), username)){
-                session.getRemote().sendString(gson.toJson(new Error("Error: Wrong team color")));
+                sendError(session, "Wrong team color");
                 return;
             }
         }else
         if(command.playerColor == ChessGame.TeamColor.BLACK){
             if(!Objects.equals(game.blackUsername(), username)){
-                session.getRemote().sendString(gson.toJson(new Error("Error: Wrong team color")));
+                sendError(session, "Wrong team color");
                 return;
             }
         }
@@ -80,12 +80,12 @@ public class WSServer {
         // testing
         var username = userService.getUsername(command.getAuthString());
         if(username == null){
-            session.getRemote().sendString(gson.toJson(new Error("Error: Bad Auth Token")));
+            sendError(session, "Bad Auth Token");
             return;
         }
         var game = gameService.getGame(command.gameID);
         if(game == null){
-            session.getRemote().sendString(gson.toJson(new Error("Error: Bad Game ID")));
+            sendError(session, "Bad Game ID");
             return;
         }
 
@@ -105,7 +105,7 @@ public class WSServer {
         var game = gameService.getGame(command.gameID);
         ChessGame.TeamColor teamColor;
         if(game.game().getGameOver()){
-            session.getRemote().sendString(gson.toJson(new Error("Error: Can't move game has ended.")));
+            sendError(session, "Can't move game has ended.");
             return;
         }
         if(Objects.equals(game.blackUsername(), username)){
@@ -114,31 +114,31 @@ public class WSServer {
         if(Objects.equals(game.whiteUsername(), username)){
             teamColor = ChessGame.TeamColor.WHITE;
         }else {
-            session.getRemote().sendString(gson.toJson(new Error("Error: Observer can't move.")));
+            sendError(session, "Observer can't move.");
             return;
         }
 
         // First checks
         if((game.game().getTeamTurn() != teamColor)){
-            session.getRemote().sendString(gson.toJson(new Error("Error: not your turn.")));
+            sendError(session, "not your turn.");
             return;
         }
 
         // Check piece
         var piece = game.game().getBoard().getPiece(command.move.getStartPosition());
         if(piece == null){
-            session.getRemote().sendString(gson.toJson(new Error("Error: No piece there.")));
+            sendError(session, "No piece there.");
             return;
         }
         if(piece.getTeamColor() != teamColor){
-            session.getRemote().sendString(gson.toJson(new Error("Error: not your piece.")));
+            sendError(session, "not your piece.");
             return;
         }
 
         try {
             gameService.makeMove(command.gameID, command.move);
         } catch (InvalidMoveException e) {
-            session.getRemote().sendString(gson.toJson(new Error("Error: Invalid move.")));
+            sendError(session, "Invalid move.");
             return;
         }
 
@@ -177,7 +177,7 @@ public class WSServer {
         var game = gameService.getGame(command.gameID);
         ChessGame.TeamColor teamWin;
         if(game.game().getGameOver()){
-            session.getRemote().sendString(gson.toJson(new Error("Error: Game Already over.")));
+            sendError(session, "Game Already over.");
             return;
         }
         if(Objects.equals(game.blackUsername(), username)){
@@ -186,12 +186,12 @@ public class WSServer {
         if(Objects.equals(game.whiteUsername(), username)){
             teamWin = ChessGame.TeamColor.BLACK;
         }else {
-            session.getRemote().sendString(gson.toJson(new Error("Error: Cannot resign.")));
+            sendError(session, "Cannot resign.");
             return;
         }
         gameService.endGame(command.gameID);
         notifyAllUsers(command.gameID,
-                username + "Has resigned from the game! " + teamWin + " Wins!"
+                username + " Has resigned from the game! " + teamWin + " Wins!"
         );
     }
 
@@ -222,6 +222,10 @@ public class WSServer {
                     new Notification(message)
             ));
         }
+    }
+
+    private void sendError(Session session, String message) throws IOException {
+        session.getRemote().sendString(gson.toJson(new Error(message)));
     }
 
 }

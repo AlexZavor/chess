@@ -61,10 +61,9 @@ public class ChessMove {
 
     @Override
     public String toString() {
-        return "Move{" +
+        return
                 "start=" + startPosition +
                 ", end=" + endPosition +
-                ", promotion=" + promotionPiece +
-                "} \n";
+                ", promotion=" + promotionPiece;
     }
 }

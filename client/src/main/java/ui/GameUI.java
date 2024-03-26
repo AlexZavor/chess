@@ -134,7 +134,9 @@ public class GameUI  extends UI implements ServerMessageObserver {
 
     private void resign() {
         if(!isObserver){
-            server.resign(authToken, game.gameID());
+            if(getString("Are you sure? [Y/N]").equalsIgnoreCase("y")){
+                server.resign(authToken, game.gameID());
+            }
         } else {
             out.println(SET_TEXT_COLOR_RED + "You can't resign as an observer!");
         }
@@ -264,7 +266,7 @@ public class GameUI  extends UI implements ServerMessageObserver {
         out.print(" " + (row+1) + " ");
 
         int color = row%2;
-        for (int col = 0; col < BOARD_SIZE; col++) {
+        for (int col = BOARD_SIZE; col > 0; col--) {
             if(color == 0){
                 setWhite();
                 color = 1;
@@ -272,7 +274,7 @@ public class GameUI  extends UI implements ServerMessageObserver {
                 setBlack();
                 color = 0;
             }
-            ChessPiece piece = game.game().getBoard().getPiece(new ChessPosition(row+1,col+1));
+            ChessPiece piece = game.game().getBoard().getPiece(new ChessPosition(row+1,col));
             printPiece(piece);
         }
 
