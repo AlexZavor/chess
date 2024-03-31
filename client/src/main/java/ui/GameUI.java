@@ -18,7 +18,7 @@ public class GameUI  extends UI implements ServerMessageObserver {
     private final boolean isObserver;
     private final String authToken;
     private final String username;
-    static int BOARD_SIZE = 8;
+    static final int BOARD_SIZE = 8;
 
     GameUI(GameData game, String authToken, String username, ChessGame.TeamColor playerTeam, boolean isObserver){
         this.game = game;
