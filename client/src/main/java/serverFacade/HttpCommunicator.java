@@ -54,8 +54,8 @@ public class HttpCommunicator {
         return stringBuilder.toString();
     }
 
-    private String doPost(String UrlPath, String authToken, String body) throws IOException {
-        HttpURLConnection connection = getConnection(UrlPath, authToken);
+    private String doPost(String urlPath, String authToken, String body) throws IOException {
+        HttpURLConnection connection = getConnection(urlPath, authToken);
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
 
@@ -95,8 +95,8 @@ public class HttpCommunicator {
         return stringBuilder.toString();
     }
 
-    private static HttpURLConnection getConnection(String UrlPath, String authToken) throws IOException {
-        URL url = new URL("http://localhost:" + port + UrlPath);
+    private static HttpURLConnection getConnection(String urlPath, String authToken) throws IOException {
+        URL url = new URL("http://localhost:" + port + urlPath);
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
