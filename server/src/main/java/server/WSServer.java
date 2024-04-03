@@ -209,9 +209,11 @@ public class WSServer {
     private void notifyOtherUsers(int gameID, String authToken, String message) throws IOException {
         for(var user : userMap.get(gameID)){
             if(!user.authToken().equals(authToken)){
-                user.session().getRemote().sendString(gson.toJson(
-                        new Notification(message)
-                ));
+                if(user.session().isOpen()){
+                    user.session().getRemote().sendString(gson.toJson(
+                            new Notification(message)
+                    ));
+                }
             }
         }
     }

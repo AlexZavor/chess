@@ -5,19 +5,29 @@ import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
-import request.*;
-import serverFacade.*;
-import webSocketMessages.serverMessages.*;
+import request.JoinGameRequest;
+import serverFacade.ServerFacade;
+import serverFacade.ServerMessageObserver;
 import webSocketMessages.serverMessages.Error;
+import webSocketMessages.serverMessages.LoadGame;
+import webSocketMessages.serverMessages.Notification;
+import webSocketMessages.serverMessages.ServerMessage;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static ui.EscapeSequences.*;
 
 public class GameUI  extends UI implements ServerMessageObserver {
     private final ServerFacade server;
     GameData game;
+    private final List<ChessPosition> validMoves = new ArrayList<>();
+    private ChessPosition validStartPosition;
     private final ChessGame.TeamColor playerTeam;
     private final boolean isObserver;
     private final String authToken;
     private final String username;
+
     static final int BOARD_SIZE = 8;
 
     GameUI(GameData game, String authToken, String username, ChessGame.TeamColor playerTeam, boolean isObserver){
@@ -143,8 +153,24 @@ public class GameUI  extends UI implements ServerMessageObserver {
     }
 
     private void highlightMoves() {
-        printBoard(playerTeam);
-        // TODO: set up how to highlight moves with drawing board
+        out.println(SET_TEXT_COLOR_BLUE + "Please select what piece to see valid moves for.");
+        out.println(SET_TEXT_COLOR_BLUE + "Enter column as letter, enter row as number.");
+        var column = getString("Column");
+        int columnInt;
+        int rowInt;
+        var row = getString("Row");
+        try{
+            rowInt = Integer.parseInt(row);
+            if(rowInt > 8){throw new NumberFormatException("Out of range");}
+            columnInt = charToInt(column);
+        } catch (NumberFormatException e) {
+            out.println(SET_TEXT_COLOR_RED + "please enter as number or letter.");
+            return;
+        }
+        var startPos = new ChessPosition(rowInt,columnInt);
+
+        printValidMoves(playerTeam, startPos);
+        printOptions();
     }
 
     private int charToInt(String in) throws NumberFormatException{
@@ -202,10 +228,10 @@ public class GameUI  extends UI implements ServerMessageObserver {
 
     // White draw methods
 
-    private void printWhiteBoard(){
+    private void printWhiteBoard(boolean doHighlightValid){
         printWhiteHeader();
         for (int row = 0; row < BOARD_SIZE; row++) {
-            printWhiteRow(row);
+            printWhiteRow(row, doHighlightValid);
         }
         printWhiteHeader();
         out.println(RESET_BG_COLOR);
@@ -218,17 +244,29 @@ public class GameUI  extends UI implements ServerMessageObserver {
         out.println();
     }
 
-    private void printWhiteRow(int row){
+    private void printWhiteRow(int row, boolean doHighlightValid){
         setHeader();
         out.print(" " + (BOARD_SIZE-row) + " ");
 
         int color = row%2;
         for (int col = 0; col < BOARD_SIZE; col++) {
             if(color == 0){
-                setWhite();
+                if(doHighlightValid && validMoves.contains(new ChessPosition(BOARD_SIZE-row, col+1))){
+                    setHighlightedWhite();
+                }else if(doHighlightValid && validStartPosition.equals(new ChessPosition(row+1, col))){
+                    setGold();
+                }else{
+                    setWhite();
+                }
                 color = 1;
             }else{
-                setBlack();
+                if(doHighlightValid && validMoves.contains(new ChessPosition(BOARD_SIZE-row, col+1))){
+                    setHighlightedBlack();
+                }else if(doHighlightValid && validStartPosition.equals(new ChessPosition(row+1, col))){
+                    setGold();
+                }else{
+                    setBlack();
+                }
                 color = 0;
             }
             ChessPiece piece = game.game().getBoard().getPiece(new ChessPosition(BOARD_SIZE-row,col+1));
@@ -245,10 +283,10 @@ public class GameUI  extends UI implements ServerMessageObserver {
 
     // Black draw methods
 
-    private void printBlackBoard(){
+    private void printBlackBoard(boolean doHighlightValid){
         printBlackHeader();
         for (int row = 0; row < BOARD_SIZE; row++) {
-            printBlackRow(row);
+            printBlackRow(row, doHighlightValid);
         }
         printBlackHeader();
         out.println(RESET_BG_COLOR);
@@ -261,17 +299,29 @@ public class GameUI  extends UI implements ServerMessageObserver {
         out.println();
     }
 
-    private void printBlackRow(int row){
+    private void printBlackRow(int row, boolean doHighlightValid){
         setHeader();
         out.print(" " + (row+1) + " ");
 
         int color = row%2;
         for (int col = BOARD_SIZE; col > 0; col--) {
             if(color == 0){
-                setWhite();
+                if(doHighlightValid && validMoves.contains(new ChessPosition(row+1, col))) {
+                    setHighlightedWhite();
+                }else if(doHighlightValid && validStartPosition.equals(new ChessPosition(row+1, col))){
+                    setGold();
+                }else{
+                    setWhite();
+                }
                 color = 1;
             }else{
-                setBlack();
+                if(doHighlightValid && validMoves.contains(new ChessPosition(row+1, col))){
+                    setHighlightedBlack();
+                }else if(doHighlightValid && validStartPosition.equals(new ChessPosition(row+1, col))){
+                    setGold();
+                }else{
+                    setBlack();
+                }
                 color = 0;
             }
             ChessPiece piece = game.game().getBoard().getPiece(new ChessPosition(row+1,col));
@@ -291,8 +341,26 @@ public class GameUI  extends UI implements ServerMessageObserver {
     private void printBoard(ChessGame.TeamColor color){
         printHeader();
         switch (color){
-            case BLACK -> printBlackBoard();
-            case WHITE -> printWhiteBoard();
+            case BLACK -> printBlackBoard(false);
+            case WHITE -> printWhiteBoard(false);
+        }
+    }
+
+    private void printValidMoves(ChessGame.TeamColor color, ChessPosition startPosition){
+        validMoves.clear();
+        var gameList = game.game().validMoves(startPosition);
+        validStartPosition = startPosition;
+        if(gameList == null){
+            out.println(SET_TEXT_COLOR_RED + "No Legal moves.");
+            return;
+        }
+        for(var move : gameList){
+            validMoves.add(move.getEndPosition());
+        }
+        printHeader();
+        switch (color){
+            case BLACK -> printBlackBoard(true);
+            case WHITE -> printWhiteBoard(true);
         }
     }
 

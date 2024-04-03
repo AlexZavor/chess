@@ -33,10 +33,17 @@ public class WebsocketCommunicator extends Endpoint {
                 } catch(Exception ex) {
                     observer.notify(new Error(ex.getMessage()));
                 }
+                if(!session.isOpen()){
+                    onMessage(message);
+                }
             }
         });
     }
     public void onOpen(Session session, EndpointConfig endpointConfig) {
+        if(this.session.isOpen()){
+            return;
+        }
+        onOpen(session,endpointConfig);
     }
 
     private ServerMessage readJson(String message) {
@@ -71,7 +78,9 @@ public class WebsocketCommunicator extends Endpoint {
 
     public void doMakeMove(String authToken, int gameID, ChessMove move) throws IOException {
         MakeMove command = new MakeMove(authToken, gameID, move);
-        this.session.getBasicRemote().sendText(gson.toJson(command));
+        if(this.session.isOpen()){
+            this.session.getBasicRemote().sendText(gson.toJson(command));
+        }
     }
 
     public void doResign(String authToken, int gameID) throws IOException {

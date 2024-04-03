@@ -57,8 +57,17 @@ public class UI {
     protected void setWhite(){
         out.print(SET_BG_COLOR_WHITE);
     }
+    protected void setHighlightedWhite(){
+        out.print(SET_BG_COLOR_GREEN);
+    }
     protected void setBlack(){
         out.print(SET_BG_COLOR_BLACK);
+    }
+    protected void setHighlightedBlack(){
+        out.print(SET_BG_COLOR_DARK_GREEN);
+    }
+    protected void setGold(){
+        out.print(SET_BG_COLOR_YELLOW);
     }
     protected void setPieceWhite(){
         out.print(SET_TEXT_COLOR_RED);
