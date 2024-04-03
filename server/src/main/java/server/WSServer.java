@@ -5,6 +5,7 @@ import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
@@ -36,6 +37,11 @@ public class WSServer {
             case LEAVE -> leave(session, (Leave) command);
             case RESIGN -> resign(session, (Resign) command);
         }
+    }
+
+    @OnWebSocketError
+    public void onError(Throwable error){
+        System.out.println("Error!" + error.getMessage());
     }
 
     private void join(Session session, JoinPlayer command) throws IOException {

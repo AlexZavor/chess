@@ -253,7 +253,7 @@ public class GameUI  extends UI implements ServerMessageObserver {
             if(color == 0){
                 if(doHighlightValid && validMoves.contains(new ChessPosition(BOARD_SIZE-row, col+1))){
                     setHighlightedWhite();
-                }else if(doHighlightValid && validStartPosition.equals(new ChessPosition(row+1, col))){
+                }else if(doHighlightValid && validStartPosition.equals(new ChessPosition(BOARD_SIZE-row,col+1))){
                     setGold();
                 }else{
                     setWhite();
@@ -262,7 +262,7 @@ public class GameUI  extends UI implements ServerMessageObserver {
             }else{
                 if(doHighlightValid && validMoves.contains(new ChessPosition(BOARD_SIZE-row, col+1))){
                     setHighlightedBlack();
-                }else if(doHighlightValid && validStartPosition.equals(new ChessPosition(row+1, col))){
+                }else if(doHighlightValid && validStartPosition.equals(new ChessPosition(BOARD_SIZE-row,col+1))){
                     setGold();
                 }else{
                     setBlack();
