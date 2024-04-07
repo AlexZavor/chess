@@ -158,6 +158,15 @@ public class WSServer {
 
         // Notify other players
         notifyOtherUsers(game.gameID(), command.getAuthString(), username + " played " + command.move);
+        if(game.game().isInCheckmate(ChessGame.TeamColor.WHITE)){
+            notifyAllUsers(game.gameID(), "White is in Checkmate!, the game is over");
+        }else if(game.game().isInCheckmate(ChessGame.TeamColor.BLACK)){
+            notifyAllUsers(game.gameID(), "Black is in Checkmate!, the game is over");
+        }else if(game.game().isInCheck(ChessGame.TeamColor.WHITE)){
+            notifyAllUsers(game.gameID(), "White is in Check!");
+        }else if(game.game().isInCheck(ChessGame.TeamColor.BLACK)){
+            notifyAllUsers(game.gameID(), "Black is in Check!");
+        }
 
     }
 

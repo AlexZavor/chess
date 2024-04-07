@@ -133,7 +133,40 @@ public class GameUI  extends UI implements ServerMessageObserver {
         }
         var destPos = new ChessPosition(destRowInt,destColumnInt);
         var move = new ChessMove(startPos,destPos,null);
+
         var validMoves = game.game().validMoves(startPos);
+
+        // Check for pawn promotion
+        for(var promotionCheck : validMoves){
+            if(promotionCheck.getPromotionPiece() != null){
+                int pro;
+                do{
+                    printPromotionOptions();
+                    pro = getInput();
+                    switch (pro){
+                        case 1:
+                            move = new ChessMove(startPos,destPos, ChessPiece.PieceType.QUEEN);
+                            break;
+                        case 2:
+                            move = new ChessMove(startPos,destPos, ChessPiece.PieceType.ROOK);
+                            break;
+                        case 3:
+                            move = new ChessMove(startPos,destPos, ChessPiece.PieceType.KNIGHT);
+                            break;
+                        case 4:
+                            move = new ChessMove(startPos,destPos, ChessPiece.PieceType.BISHOP);
+                            break;
+                        default:
+                            pro = 0;
+                            out.println(SET_TEXT_COLOR_RED + "Please select a valid option.");
+                            break;
+                    }
+                }while (pro == 0);
+                break;
+            }
+        }
+
+        // Check if valid
         if(!validMoves.contains(move)){
             out.println(SET_TEXT_COLOR_RED + "Not a valid move");
             return;
@@ -223,6 +256,15 @@ public class GameUI  extends UI implements ServerMessageObserver {
         out.println("    4 > Make Move - Make your move in the game");
         out.println("    5 > Resign - Resign from the game, ending the game and the opponent wins");
         out.println("    6 > Highlight Legal Moves - Highlights squares that a piece can move to");
+    }
+
+    private void printPromotionOptions(){
+        out.print(SET_TEXT_COLOR_BLUE);
+        out.println("Type the number of the option you would like.");
+        out.println("    1 > Queen");
+        out.println("    2 > Rook");
+        out.println("    3 > Knight");
+        out.println("    4 > Bishop");
     }
 
 
